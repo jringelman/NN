@@ -2,6 +2,7 @@ package jmr.nn;
 
 import java.util.Arrays;
 
+import jmr.util.ArrayUtil;
 import jmr.util.StdOut;
 
 public class Layer {
@@ -11,35 +12,35 @@ public class Layer {
 	int m_nNbrInputs;
 	double m_dBias;
 	
+	/*
 	public Layer(Neuron [] aNeurons, int nLayerNbr,  int nNbrInputs, double dBias)
 	{
 		m_aNeurons = aNeurons.clone();
 		m_nLayerNbr = nLayerNbr;
 		m_nNbrInputs = nNbrInputs;
 		m_dBias = dBias;
-	}
+	}*/
 	
-	public Layer(int nLayerNbr, int nNbrNeurons,  int nNbrInputs, double dBias)
+	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
 	{
 		m_nLayerNbr = nLayerNbr;
 		m_aNeurons = new Neuron[nNbrNeurons];
 		m_nNbrInputs = nNbrInputs;
 		m_dBias = dBias;
 		//public Neuron (int iLayerNbr, int iNeuronNbr, int nNbrInputs)
-		for(int i=0; i< nNbrNeurons; i++)
-			m_aNeurons[i] = new Neuron(nLayerNbr, i, nNbrInputs);
+		for(int iNeuronNbr=0; iNeuronNbr< nNbrNeurons; iNeuronNbr++)
+			m_aNeurons[iNeuronNbr] = new Neuron(nLayerNbr, iNeuronNbr, nNbrInputs);
 	}
-
 	
 	public int getNbrNeurons() {
 		return m_aNeurons.length;
 	}
 	
-	public void randomizeWeights()
+	/*public void randomizeWeights()
 	{
 		for(int i=0; i<m_aNeurons.length; i++) 
 			m_aNeurons[i].randomizeWeights();
-	}
+	}*/
 	
 	public void setWeights(double [][] aadWeights)
 	{
@@ -83,8 +84,7 @@ public class Layer {
 		for(int iNeuron=0; iNeuron<m_aNeurons.length; iNeuron++) {
 			aadETdACTNext[iNeuron] = m_aNeurons[iNeuron].computeNewWeights(adETdACT[iNeuron], dLearningRate);
 		}
-		
-		
+				
 		//HAVE TO BE CAREFULL HOW TO ADD VALUES IN aadETdACTNext TO PASS TO UPSTREAM LAYER
 		double [] adETdACTNext = new double [m_nNbrInputs];
 		Arrays.fill(adETdACTNext, 0.0);
@@ -94,26 +94,22 @@ public class Layer {
 		
 		return adETdACTNext;
 	}
-	
-	public static void test()
-	{
-		Neuron [] aNeurons = new Neuron [2];
-		double[] adWeights = new double[2]; 
-        double adBias; 
-
-        //LAYER 1
-        adBias = 0.35;
-        adWeights[0] = 0.15;
-        adWeights[1] = 0.20;
-        aNeurons[0] = new Neuron(adWeights, 1,1); 
-        adWeights[0] = 0.25;
-        adWeights[1] = 0.30;
-        aNeurons[1] = new Neuron(adWeights, 1,2); 
-
-        Layer layer = new Layer(aNeurons, 1, 2, adBias);
-		double[] adInputs = {0.05,0.1};
-		adInputs = layer.activate(adInputs);
 		
-	}
+	public static void test1()
+	{
+	    final int iLAYER_NBR = 0;
+	    final int iNBR_NEURONS = 2;
+        final int iNBR_OF_INPUTS = 2;
+		double dBias = 0.35; 
 
+		Layer layer = new Layer(iLAYER_NBR, iNBR_OF_INPUTS, iNBR_NEURONS, dBias);
+	    
+		double[][] aadWeights = {{0.15,0.2},{0.25,0.3}} ;
+		layer.setWeights(aadWeights);
+				
+	    double[] adInputs = {0.05,0.1};  
+	    double adActivation[] = layer.activate(adInputs);
+	    ArrayUtil.show(adActivation, "adActivation");
+	    
+	}
 }

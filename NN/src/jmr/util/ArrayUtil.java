@@ -128,7 +128,7 @@ public class ArrayUtil {
 	}
 
 
-
+/***********  STATIC TEST METHOD ********************/
 	public static void test()
 	{
 		

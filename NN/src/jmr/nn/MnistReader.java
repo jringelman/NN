@@ -7,7 +7,7 @@ package jmr.nn;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
+//import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -131,6 +131,9 @@ public class MnistReader {
 		return adTarget;
 	}
 	
+//************ STATIC TEST METHODS *****************
+	
+	
 	public static void test()
 	{
 		
@@ -187,11 +190,5 @@ public class MnistReader {
 			//System.out.print(listTrainImages.);
 			//System.out.println("");
 		    	}catch(Exception e){System.out.println(e);}   
-	
-					
-	    	
-	  	
 	}
-	
-
 }

@@ -1,4 +1,4 @@
-package jmr;
+package jmr.nn;
 
 
 import java.io.File;
@@ -6,7 +6,6 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import jmr.util.Log;
 import jmr.util.AppProperties;
-import jmr.nn.NeuralNetwork;
 
 //MUST PASS IN FULL PATH TO PROPERTIES FILE
 //    e.g ==>  /Users/JMR/Dropbox/projects/git/repository/AppTestJava/AppTestMain.properties
@@ -29,13 +28,14 @@ public class NNApp1 {
 		try	{AppProperties.loadProperties(sPropertiesFile);}catch (Exception e) {System.out.println(e);}
 		
 		//OPEN LOG FILE
-		openLogFile();
+		//openLogFile();
 		
-		NeuralNetwork.useMinstData();
+		//NeuralNetwork.useMinstData();
 		
 	//	TestClass tc = new TestClass();
 		//tc.test();
 
+		test1();
 		//CAN USE CONSTRUCTOR OR JUST USE STATIC METHODS
 		//	new AppTestMain();
 	}
@@ -65,7 +65,11 @@ public class NNApp1 {
 	
 	public static void test1()
 	{
-		System.out.println("In test1 method");
+		System.out.println("NNApp1.test1 method");
+		//Neuron.test2();
+		//Layer.test1();
+	//	NeuralNetwork.test1();
+		NeuralNetwork.useMinstData();
 	//	TestClass tc = new TestClass();
 	//	tc.test();
 	}

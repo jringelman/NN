@@ -16,24 +16,25 @@ public class NeuralNetwork {
 	Layer [] m_aLayer;
 	double m_dLearningRate;
 	
+	//int m_iNbrInputs;
+	
 	public NeuralNetwork(Layer [] aLayers, double dLearningRate){
 		m_aLayer =  aLayers;
 		m_dLearningRate = dLearningRate;
 	}
-
 	
-	public void randomizeWeights()
+/*public void randomizeWeights()
 	{
 		for(int i=0; i<m_aLayer.length; i++) 
 			m_aLayer[i].randomizeWeights();
-	}
+	}*/
 	
 	public void setWeights(int iLayer, double [][] aadWeights)
 	{
 		m_aLayer[iLayer].setWeights(aadWeights);
 	}
 	
-	public double [] useNN(double [] adInput, double [] adTarget) {
+	public double [] activateNN(double [] adInput, double [] adTarget) {
 		double [] adACT = adInput;
 		
 		//FEEDFORWARD - ACTIVATE EACH LAYER GOING FORWARD
@@ -48,6 +49,7 @@ public class NeuralNetwork {
 		double [] adACT = adInput;
 		double [][] aadACT = new double [2][];
 		
+		
 		//FEEDFORWARD - ACTIVATE EACH LAYER GOING FORWARD
 		for (int iLayer=0; iLayer<m_aLayer.length; iLayer++) {
 			adACT = m_aLayer[iLayer].activate(adInput);
@@ -56,15 +58,12 @@ public class NeuralNetwork {
 			//ArrayUtil.show(adACT, "adACT for Layer " + iLayer);
 		}
 		
-
-		//CALC TOTAL ERROR
+		//CALC TOTAL ERROR FOR OUTPUT LAYER
 		double dErrorTotal = m_aLayer[m_aLayer.length-1].computeError(adTarget);
 
 		//BACKPROPOGATE OUTPUT LAYER
-		
-		//WITH dET/dACT AS INPUT, EACH LAYER CAN COMPUTE NEW WEIGHTS
-		//AND, EACH LAYER WILLL RETURN dET/dACT as input for upstream layer
-
+		//  WITH dET/dACT AS INPUT, EACH LAYER CAN COMPUTE NEW WEIGHTS
+		//  AND, EACH LAYER WILL RETURN dET/dACT as input for upstream layer
 		//TO START, FOR OUTPUT LAYER, dET/dACT = (ACT-TARGET)
 		double [] adETdACT = ArrayUtil.minus(adACT, adTarget);
 		
@@ -78,13 +77,16 @@ public class NeuralNetwork {
 	{
 		double dBias = 0.1; 
 		final double dLEARNING_RATE = 0.1;
+		final int iNBR_INPUTS = 784; //28 x 28 pixels = 784 pixels
+		final int iNBR_NEURONS_LAYER0 = 20; // THIS IN THE ONLY HIDDEN LAYER
+		final int iNBR_NEURONS_LAYER1 = 10; // THIS IS OUPUT LAYER WITH EACH NODE FOR DIGITS 0 THRU 9;
+		final int iNBR_EPOCHS = 1;
 	      	
 		Layer [] aLayer = new Layer[2];
-		//Layer(int nLayerNbr, int nNbrNeurons,  int nNbrInputs, double dBias)
-	    aLayer[0] = new Layer(0, 20, 784, dBias);
-	    aLayer[1] = new Layer(1, 10, 20, dBias);
+		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
+	    aLayer[0] = new Layer(0, iNBR_INPUTS, iNBR_NEURONS_LAYER0, dBias);
+	    aLayer[1] = new Layer(1, iNBR_NEURONS_LAYER0, iNBR_NEURONS_LAYER1, dBias);
 	    NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
-	    nn.randomizeWeights();
 
 	    //TRAIN THE NN WITH MINST DATA
 	    String sMinstDataPath = "";
@@ -102,10 +104,11 @@ public class NeuralNetwork {
     	
 		System.out.println(aiTrainLabels.length + " Train Labels");
 		System.out.println(listTrainImages.size() + " Train Images");
+		System.out.println("Beginning " + iNBR_EPOCHS + " epochs of training");
 
-		for (int iEpoch=0; iEpoch<10; iEpoch++)
+		for (int iEpoch=0; iEpoch<iNBR_EPOCHS; iEpoch++)
 		{
-			System.out.println("\nEpoch: " + iEpoch);
+			//System.out.println("\nEpoch: " + iEpoch);
 			for (int i=0; i<aiTrainLabels.length; i++) {
 			
 				double[] adTarget = MnistReader.createTarget(aiTrainLabels[i]);
@@ -122,9 +125,9 @@ public class NeuralNetwork {
 				double [][] aadACT = nn.trainNetwork(adInput, adTarget);
 				if(((i+1) % 10000) == 0)
 				{
-					System.out.println("Trained: " + (i+1));
-					ArrayUtil.show(aadACT[0], "Layer 0");
-					ArrayUtil.show(aadACT[1], "Layer 1");
+					System.out.println((i+1) + " Images trained for Epoch " + iEpoch);
+				//	ArrayUtil.show(aadACT[0], "  Layer 0 Activations");
+					//ArrayUtil.show(aadACT[1], "  Layer 1 Activations");
 				}
 			}	
 		} 
@@ -155,7 +158,7 @@ public class NeuralNetwork {
 			int [] aiImageFlat = MnistReader.flat(aaiImage);
 			double[] adInput = MnistReader.scaleImagePixels(aiImageFlat);
 
-			double [] adOutput = nn.useNN(adInput, adTarget);
+			double [] adOutput = nn.activateNN(adInput, adTarget);
 			int iNNGuess = ArrayUtil.maxValueIndex(adOutput);
 			if(iNNGuess ==  aiTestLabels[i])
 				iCorrect++;
@@ -166,79 +169,58 @@ public class NeuralNetwork {
 		//	String sImage = MnistReader.renderImage(aaiImage);
 		//	System.out.println(sImage);
 		} 
-		StdOut.printf("Correct: %d  Wrong: %d  Total:%d\n", iCorrect, iWrong, (iCorrect + iWrong) );
+		StdOut.printf("Total Images Trained: %d Correct: %d  Wrong: %d Accuracy %5.1f%%\n",(iCorrect + iWrong), iCorrect, iWrong, (double)iCorrect/(double)(iCorrect + iWrong)*100.0);
+//		StdOut.printf("Correct: %d  Wrong: %d  Total:%d\n", iCorrect, iWrong, (iCorrect + iWrong) );
 
     	}catch(Exception e){System.out.println(e);}   
 	
 	}
 
 
-	public static void test2()
+	public static void test1()
 	{
-        double dBias; 
+		final int iNBR_NEURONS_LAYER_0 = 2; // THIS IN THE ONLY HIDDEN LAYER
+		final int iNBR_NEURONS_LAYER_1 = 2; // THIS IS OUPUT LAYER 
+		final double dLAYER_0_BIAS = 0.35;
+        final double dLAYER_1_BIAS = 0.60;
+        
       	double[] adInput = {0.05,0.1};  
       	double[] adTarget = {0.01,0.99};  
         final double dLEARNING_RATE = 0.5;
       	
 		Layer [] aLayer = new Layer[2];
-		
-      	dBias = 0.35;
-        aLayer[0] = new Layer(0, 2, adInput.length, dBias);
-        
-        dBias = 0.60;
-        aLayer[1] = new Layer(1, 2, aLayer[0].getNbrNeurons(), dBias);
+
+		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
+        aLayer[0] = new Layer(0, adInput.length, iNBR_NEURONS_LAYER_0, dLAYER_0_BIAS);
+        aLayer[1] = new Layer(1, iNBR_NEURONS_LAYER_0, iNBR_NEURONS_LAYER_1, dLAYER_1_BIAS);
 
         NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
         
-		//double[] adWeights = new double[2]; 
-      //  nn.randomizeWeights();
 		double[][] aadWeights0 = {{0.15,0.2},{0.25,0.3}} ;
 		double[][] aadWeights1 = {{0.4,0.45},{0.5,0.55}} ;
 		aLayer[0].setWeights(aadWeights0);
 		aLayer[1].setWeights(aadWeights1);
 				
-        nn.trainNetwork(adInput, adTarget);
+		double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
+		//ArrayUtil.show(aadReturn, "aadReturn", "%9.5f");
   	}
-	
-	public static void test1()
+
+/*	public NeuralNetwork (int iNbrInputs, double dLearningRate)
 	{
-		Neuron [] aNeurons = new Neuron [2];
-		double[] adWeights = new double[2]; 
-        double dBias; 
-        Layer [] aLayer = new Layer[2];
-        final double dLEARNING_RATE = 0.5;
-      //  final int iNBR_INPUTS_TO_HIDDEN = 2;;
+		this.m_dLearningRate = dLearningRate;
+		
+	}
+	
+	public static void test2()
+	{
+		final int iNBR_NEURONS_LAYER_0 = 2; // THIS IN THE ONLY HIDDEN LAYER
+		final int iNBR_NEURONS_LAYER_1 = 2; // THIS IS OUPUT LAYER 
+		final double dLAYER_0_BIAS = 0.35;
+        final double dLAYER_1_BIAS = 0.60;
         
-        //CREATE INPUT
-      	double[] adInput = {0.05,0.1};  //[2][1]
+        NeuralNetwork nn = new NeuralNetwork(); 
+ 
+	}*/
 
-      	//CREATE TARGET
-      	double[] adTarget = {0.01,0.99};  //[2][1]
-
-        
-        //LAYER 1
-      	dBias = 0.35;
-        adWeights[0] = 0.15;
-        adWeights[1] = 0.20;
-        aNeurons[0] = new Neuron(adWeights, 0,0); 
-        adWeights[0] = 0.25;
-        adWeights[1] = 0.30;
-        aNeurons[1] = new Neuron(adWeights, 0,1); 
-        aLayer[0] = new Layer(aNeurons, 0,adInput.length, dBias);
-
-       
-        //LAYER 2
-        dBias = 0.60;
-        adWeights[0] = 0.40;
-        adWeights[1] = 0.45;
-        aNeurons[0] = new Neuron(adWeights, 1,0); 
-        adWeights[0] = 0.50;
-        adWeights[1] = 0.55;
-        aNeurons[1] = new Neuron(adWeights, 1,1); 
-        aLayer[1] = new Layer(aNeurons, 1, aLayer[0].getNbrNeurons(), dBias);
-
-        NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
-         		
-		nn.trainNetwork(adInput, adTarget);
-		}
+	
 }

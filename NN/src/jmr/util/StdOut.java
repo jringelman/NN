@@ -302,7 +302,7 @@ public final class StdOut {
      * Unit tests some of the methods in {@code StdOut}.
      *
      * @param args the command-line arguments
-     */
+     *//*
     public static void main(String[] args) {
 
         // write to stdout
@@ -310,6 +310,6 @@ public final class StdOut {
         StdOut.println(17);
         StdOut.println(true);
         StdOut.printf("%.6f\n", 1.0/7.0);
-    }
+    }*/
 
 }

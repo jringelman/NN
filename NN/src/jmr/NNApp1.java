@@ -6,6 +6,7 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import jmr.util.Log;
 import jmr.util.AppProperties;
+import jmr.nn.NeuralNetwork;
 
 //MUST PASS IN FULL PATH TO PROPERTIES FILE
 //    e.g ==>  /Users/JMR/Dropbox/projects/git/repository/AppTestJava/AppTestMain.properties
@@ -29,6 +30,8 @@ public class NNApp1 {
 		
 		//OPEN LOG FILE
 		openLogFile();
+		
+		NeuralNetwork.useMinstData();
 		
 	//	TestClass tc = new TestClass();
 		//tc.test();
@@ -63,8 +66,8 @@ public class NNApp1 {
 	public static void test1()
 	{
 		System.out.println("In test1 method");
-		TestClass tc = new TestClass();
-		tc.test();
+	//	TestClass tc = new TestClass();
+	//	tc.test();
 	}
 	
 }

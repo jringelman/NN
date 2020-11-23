@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/NN.properties</name>
+			<type>1</type>
+			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/NN.properties</location>
+		</link>
+	</linkedResources>
 </projectDescription>

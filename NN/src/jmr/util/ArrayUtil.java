@@ -7,14 +7,9 @@ public class ArrayUtil {
 	public ArrayUtil(){
 	}
 	
-	public static void show (double [] ad, String sName)
-	{
-		StdOut.println(sName);
-		for (int i=0; i<ad.length; i++){
-			StdOut.printf("%9.5f ", ad[i]);
-		}
-		StdOut.println();
-	}
+	//public static void show (double [] ad, String sName)	{
+	//	show(ad,sName, "%9.5f");
+	//}
 	
 	public static void show (double [] ad, String sName, String sFormat)
 	{
@@ -36,7 +31,36 @@ public class ArrayUtil {
         }
 		StdOut.println();
 	} 
+	
+	public static void showFlat (double [] ad, String sName, String sFormat)
+	{
+    	StdOut.printf(sName +" {");
+		for (int i=0; i<ad.length; i++){
+			StdOut.printf(sFormat, ad[i]);
+            if (i < ad.length-1)
+                StdOut.print(",");
+		}
+		StdOut.println("}");
+	}
 
+	public static void showFlat (double [][] aad, String sName, String sFormat)
+	{
+    	StdOut.print(sName + " {");
+    	for (int i = 0; i < aad.length; i++) {
+    		StdOut.print("{"); 
+    		for (int j = 0; j < aad[0].length; j++) { 
+                StdOut.printf(sFormat, aad[i][j]);
+                if (j < aad[0].length-1)
+                    StdOut.print(",");
+            }
+            StdOut.print("}");
+            if (i < aad.length-1)
+                StdOut.print(",");
+	    }
+		StdOut.println("}");
+	} 
+
+	
 	//MULTIPLIES EACH ELEMENT OF DOUBLE [] BY DOUBLE VALUE; RETURNS NEW ARRAY; DOES NOT MODIFY ORIGINAL ARRAY.
 	public static double [] times(double[] ad, double d)
 	{
@@ -131,21 +155,20 @@ public class ArrayUtil {
 /***********  STATIC TEST METHOD ********************/
 	public static void test()
 	{
-		
-		double [] ad5 = {1.0, 2.22222, 3.33, 4.444444444444, -1.5, 2.3};
-		double dMaxValue = ArrayUtil.maxValue(ad5);
-		System.out.println(Arrays.toString(ad5));
-		System.out.println(dMaxValue);
-		int nMaxValueIndex = ArrayUtil.maxValueIndex(ad5);
-		System.out.println(nMaxValueIndex);
+		double [][] aad6 = {{1.1,2.2},{3.3, 4.4},{5.5,6.6}};
+		ArrayUtil.show(aad6, "aad6 NORMAL", "%8.5f");
+		StdOut.println();
+		ArrayUtil.showFlat(aad6, "FLAT DOUBLE ARRAY", "%9.5f");
+		StdOut.println();
 
-
-		
 		double [] ad3 = {1.0, 2.22222, 3.33, 4.444444444444};
 	//	ArrayUtil.show(ad, "Test Single Array", "%9.5f ");
 	//	ArrayUtil.show(ad, "Test Single Array");
-		ArrayUtil.show(ad3, "Test Single Array");
-		
+		ArrayUtil.show(ad3, "Test Single Array", "%8.5f");
+		StdOut.println();
+		ArrayUtil.showFlat(ad3, "Test Single Array - flat", "%8.5f");
+		StdOut.println();
+
 		//double [][] aad = {{1.11,222.22},{3.3333, 444444444.4},{555555.55,66.6666}};
 		//ArrayUtil.show(aad, "double array", "%9.5f ");
 	
@@ -162,6 +185,13 @@ public class ArrayUtil {
 		ArrayUtil.show(ad, "ad", "%9.5f ");
 		ArrayUtil.show(aaRet, "aaRet", "%9.5f ");
 
+		double [] ad5 = {1.0, 2.22222, 3.33, 4.444444444444, -1.5, 2.3};
+		double dMaxValue = ArrayUtil.maxValue(ad5);
+		System.out.println(Arrays.toString(ad5));
+		System.out.println(dMaxValue);
+		int nMaxValueIndex = ArrayUtil.maxValueIndex(ad5);
+		System.out.println(nMaxValueIndex);
+		
 	}
 	
 }

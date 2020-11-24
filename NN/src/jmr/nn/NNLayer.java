@@ -36,12 +36,6 @@ public class NNLayer {
 		return m_aNeurons.length;
 	}
 	
-	/*public void randomizeWeights()
-	{
-		for(int i=0; i<m_aNeurons.length; i++) 
-			m_aNeurons[i].randomizeWeights();
-	}*/
-	
 	protected void setWeights(double [][] aadWeights)
 	{
 		for(int i=0; i<m_aNeurons.length; i++)
@@ -95,9 +89,9 @@ public class NNLayer {
 		return adETdACTNext;
 	}
 
-	//**************************************************
-	//************ STATIC TEST METHODS *****************
-	//**************************************************
+//*********************************************************
+//************ STATIC METHODS FOR TESTING *****************
+//*********************************************************
 
 
 	public static void test1()
@@ -114,7 +108,7 @@ public class NNLayer {
 				
 	    double[] adInputs = {0.05,0.1};  
 	    double adActivation[] = layer.activate(adInputs);
-	    ArrayUtil.show(adActivation, "adActivation");
+	    ArrayUtil.showFlat(adActivation, "adActivation", "%8.5f");
 	    
 	}
 }

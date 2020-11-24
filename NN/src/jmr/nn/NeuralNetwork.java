@@ -9,7 +9,7 @@ import jmr.util.StdOut;
 /* NeuralNetwork is composed of 1 or more NNLayers which are composed of Neurons.
  * There is no input layer. Inputs are simply passed to the first layer
  * The last layer is the output layer. Prior layers are hidden layers.
- * By default, the initial weights for each neuron are randomly generated. For debugging, the weights can be overidden.
+ * By default, the initial weights for each neuron are randomly generated. For debugging, the weights can be overridden.
  * The neurons use a sigmoid activation function.
  */
 
@@ -48,8 +48,7 @@ public class NeuralNetwork {
 		}
 	}
 	
-	public void setWeights(int iLayer, double [][] aadWeights)
-	{
+	public void setWeights(int iLayer, double [][] aadWeights) {
 		m_aLayer[iLayer].setWeights(aadWeights);
 	}
 	
@@ -64,10 +63,9 @@ public class NeuralNetwork {
 		return adACT; //RETURNS FINAL OUTPUT
 	}
 
-	public double [][] trainNetwork(double [] adInput, double [] adTarget){
+	public double trainNetwork(double [] adInput, double [] adTarget){
 		double [] adACT = adInput;
 		double [][] aadACT = new double [2][];
-		
 		
 		//FEEDFORWARD - ACTIVATE EACH LAYER GOING FORWARD
 		for (int iLayer=0; iLayer<m_aLayer.length; iLayer++) {
@@ -89,118 +87,17 @@ public class NeuralNetwork {
 		for (int iLayer=m_aLayer.length-1;iLayer >=0; iLayer--) {
 			adETdACT = m_aLayer[iLayer].computeNewWeights(adETdACT, m_dLearningRate);
 		}
-		return aadACT;
+		return dErrorTotal;
 	}
 
-//**************************************************
-//************ STATIC TEST METHODS *****************
-//**************************************************
-
 	
-	public static void testMinstData()
-	{
-		double dBias = 0.1; 
-		final double dLEARNING_RATE = 0.1;
-		final int iNBR_INPUTS = 784; //28 x 28 pixels = 784 pixels
-		final int iNBR_NEURONS_LAYER0 = 20; // THIS IN THE ONLY HIDDEN LAYER
-		final int iNBR_NEURONS_LAYER1 = 10; // THIS IS OUPUT LAYER WITH EACH NODE FOR DIGITS 0 THRU 9;
-		final int iNBR_EPOCHS = 1;
-	      	
-		NNLayer [] aLayer = new NNLayer[2];
-		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
-	    aLayer[0] = new NNLayer(0, iNBR_INPUTS, iNBR_NEURONS_LAYER0, dBias);
-	    aLayer[1] = new NNLayer(1, iNBR_NEURONS_LAYER0, iNBR_NEURONS_LAYER1, dBias);
-	    NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
-
-	    //TRAIN THE NN WITH MINST DATA
-	    String sMinstDataPath = "";
-		try{
-			sMinstDataPath = AppProperties.getProperty("dir.mnistdata");
-		}catch (Exception e) {System.out.println(e);}
-
-    	String sFileTrainLabels = sMinstDataPath + "train-labels-idx1-ubyte.gz";
-    	String sFileTrainImages = sMinstDataPath + "train-images-idx3-ubyte.gz";
-
-    	try{
-    		 
-    	int[] aiTrainLabels = MnistReader.getLabels(Paths.get(sFileTrainLabels));
-    	List<int[][]> listTrainImages = MnistReader.getImages(Paths.get(sFileTrainImages));
-    	
-		System.out.println(aiTrainLabels.length + " Train Labels");
-		System.out.println(listTrainImages.size() + " Train Images");
-		System.out.println("Beginning " + iNBR_EPOCHS + " epochs of training");
-
-		for (int iEpoch=0; iEpoch<iNBR_EPOCHS; iEpoch++)
-		{
-			//System.out.println("\nEpoch: " + iEpoch);
-			for (int i=0; i<aiTrainLabels.length; i++) {
-			
-				double[] adTarget = MnistReader.createTarget(aiTrainLabels[i]);
-			
-				int[][] aaiImage = listTrainImages.get(i);
-			//	String sImage = MnistReader.renderImage(aaiImage);
-			//	System.out.println(sImage);
-
-				int [] aiImageFlat = MnistReader.flat(aaiImage);
-				double[] adInput = MnistReader.scaleImagePixels(aiImageFlat);
-				//System.out.println("adInput.length= " + adInput.length);
-				//System.out.println("adTarget.length= " + adTarget.length);
-			
-				double [][] aadACT = nn.trainNetwork(adInput, adTarget);
-				if(((i+1) % 10000) == 0)
-				{
-					System.out.println((i+1) + " Images trained for Epoch " + iEpoch);
-				//	ArrayUtil.show(aadACT[0], "  Layer 0 Activations");
-					//ArrayUtil.show(aadACT[1], "  Layer 1 Activations");
-				}
-			}	
-		} 
-	  	}catch(Exception e){System.out.println(e);}   
-
-    	//TEST THE NN
-    	
-       	String sFileTestLabels = sMinstDataPath + "t10k-labels-idx1-ubyte.gz";
-    	String sFileTestImages = sMinstDataPath + "t10k-images-idx3-ubyte.gz";
-
-    	try{
-    	
-    	int[] aiTestLabels = MnistReader.getLabels(Paths.get(sFileTestLabels));
-    	List<int[][]> listTestImages = MnistReader.getImages(Paths.get(sFileTestImages));
-    	
-		System.out.println(aiTestLabels.length + " Test Labels");
-		System.out.println(listTestImages.size() + " Test Images");
-    	
-		int iCorrect =0;
-		//int iWrong = 0;
-		
-		for (int i=0; i<aiTestLabels.length; i++) {			
-			int[][] aaiImage = listTestImages.get(i);
-			int [] aiImageFlat = MnistReader.flat(aaiImage);
-			double[] adInput = MnistReader.scaleImagePixels(aiImageFlat);
-
-			double [] adOutput = nn.query(adInput);
-			int iNNGuess = ArrayUtil.maxValueIndex(adOutput);
-			if(iNNGuess ==  aiTestLabels[i])
-				iCorrect++;
-			//else
-			//	iWrong++;
-		//	StdOut.printf("Test Label Target: %d  NN Guess: %d\n", aiTestLabels[i], iNNGuess);
-		//	ArrayUtil.show(adOutput, "NN Output");
-		//	String sImage = MnistReader.renderImage(aaiImage);
-		//	System.out.println(sImage);
-		} 
-		StdOut.printf("Total Images Trained: %d Correct: %d  Wrong: %d Accuracy %5.1f%%\n",aiTestLabels.length, iCorrect, aiTestLabels.length - iCorrect, (double)iCorrect/(double) aiTestLabels.length * 100.0);
-//		StdOut.printf("Correct: %d  Wrong: %d  Total:%d\n", iCorrect, iWrong, (iCorrect + iWrong) );
-
-    	}catch(Exception e){System.out.println(e);}   
-	
-	}
-
+//*********************************************************
+//************ STATIC METHODS FOR TESTING *****************
+//*********************************************************
 
 	public static void test1()
 	{	//BUILDING THIS NEURAL NETWORK TO VERIFY SAME RESULTS:
 		//	https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
-		
 		
 		final int iNBR_NEURONS_LAYER_0 = 2; // THIS IN THE ONLY HIDDEN LAYER
 		final int iNBR_NEURONS_LAYER_1 = 2; // THIS IS OUPUT LAYER 
@@ -224,9 +121,12 @@ public class NeuralNetwork {
 		nn.setWeights(0, aadWeights0);
 		nn.setWeights(1, aadWeights1);
 				
-		double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
+//		double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
 		//ArrayUtil.show(aadReturn, "aadReturn", "%9.5f");
-  	}
+  
+		double dTotalError = nn.trainNetwork(adInput, adTarget);
+		StdOut.printf("Total Error=%d\n", dTotalError);
+	}
 
 	
 	public static void test2()
@@ -256,9 +156,9 @@ public class NeuralNetwork {
       	double[] adInput = {0.05,0.1};  
       	double[] adTarget = {0.01,0.99};  
 
-		double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
+		double dTotalError = nn.trainNetwork(adInput, adTarget);
+		StdOut.printf("Total Error=%d\n", dTotalError);
 
+	//	double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
 	}
-
-	
 }

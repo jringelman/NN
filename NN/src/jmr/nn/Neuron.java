@@ -95,8 +95,17 @@ public class Neuron {
 		double [] adNETdW =  m_adInputs.clone(); // dNETdW is the INPUTS
 		double [] adETdW = ArrayUtil.times(adNETdW, dETdNET);
 		double [] adNewWeights = ArrayUtil.minus(m_adWeights, ArrayUtil.times(adETdW, dLearningRate));
-		//ArrayUtil.show(adNewWeights,"Neuron " + m_iLayerNbr + ":" + m_iNeuronNbr + " New Weights");
-
+		
+		/*  JUST A BUNCH OF TRACE OUTPUTS FOR DEBUGGING
+		StdOut.printf("Neuron %d:%d\n", m_iLayerNbr, m_iNeuronNbr);
+		StdOut.printf("   dETdACT= %9.5f\n", dETdACT);
+		StdOut.printf("   dACTdNET= %9.5f\n", dACTdNET);
+		StdOut.printf("   dETdNET= %9.5f\n", dETdNET);
+		ArrayUtil.show(adNETdW,"adNETdW");
+		ArrayUtil.show(adETdW,"adETdW");
+		String sLabel = "Neuron " + m_iLayerNbr + ":" + m_iNeuronNbr + " New Weights";*/
+		ArrayUtil.show(adNewWeights,"Neuron " + m_iLayerNbr + ":" + m_iNeuronNbr + " New Weights");
+				
 		/*
 		COMPUTE dET/dACT TO BE USED BY upstream layers (returns one value for each weight) 
 		     dET/dACT = dNET(this layer)/dACT(upstream layer) x dE/dNET(this layer)
@@ -106,16 +115,8 @@ public class Neuron {
 		double [] adNETdACTupstrm =  m_adWeights.clone(); // dNETdACTup is the weights.
 		double [] adEdACTupstrm  = ArrayUtil.times(adNETdACTupstrm, dETdNET);
 
-		/*  JUST A BUNCH OF TRACE OUTPUTS FOR DEBUGGING
-		StdOut.printf("Neuron %d:%d\n", m_iLayerNbr, m_iNeuronNbr);
-		StdOut.printf("   dETdACT= %9.5f\n", dETdACT);
-		StdOut.printf("   dACTdNET= %9.5f\n", dACTdNET);
-		StdOut.printf("   dETdNET= %9.5f\n", dETdNET);
-		ArrayUtil.show(adNETdW,"adNETdW");
-		ArrayUtil.show(adETdW,"adETdW");
-		String sLabel = "Neuron " + m_iLayerNbr + ":" + m_iNeuronNbr + " New Weights";
-		ArrayUtil.show(adNewWeights,"Neuron " + m_iLayerNbr + ":" + m_iNeuronNbr + " New Weights");
-		ArrayUtil.show(adNETdACTupstrm,"adNETdACTupstrm");
+	/*	MORE DEBUGGING TRACES
+	 	ArrayUtil.show(adNETdACTupstrm,"adNETdACTupstrm");
 		ArrayUtil.show(adEdACTupstrm,"adEdACTupstrm");
 		*/
 		

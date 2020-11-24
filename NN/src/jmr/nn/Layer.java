@@ -42,7 +42,7 @@ public class Layer {
 			m_aNeurons[i].randomizeWeights();
 	}*/
 	
-	public void setWeights(double [][] aadWeights)
+	protected void setWeights(double [][] aadWeights)
 	{
 		for(int i=0; i<m_aNeurons.length; i++)
 			m_aNeurons[i].setWeights(aadWeights[i]);

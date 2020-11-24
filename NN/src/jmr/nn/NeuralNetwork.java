@@ -15,20 +15,45 @@ public class NeuralNetwork {
 	
 	Layer [] m_aLayer;
 	double m_dLearningRate;
+	int m_iNbrNNInputs;
 	
-	//int m_iNbrInputs;
+	//THERE ARE 2 WAYS TO CREATE NeuralNetwork
 	
+	//METHOD 1 IS TO CREATE THE LAYERS THEN PASS THEM IN
 	public NeuralNetwork(Layer [] aLayers, double dLearningRate){
 		m_aLayer =  aLayers;
 		m_dLearningRate = dLearningRate;
 	}
 	
-/*public void randomizeWeights()
-	{
-		for(int i=0; i<m_aLayer.length; i++) 
-			m_aLayer[i].randomizeWeights();
-	}*/
+	//METHOD 2 IS TO PASS IN ARRAYS WITH THE LAYOUT OF THE NEURONS AND THE ASSOCIATED BIASES AND LET NeuralNetwork CREATE THE LAYERS
+	public NeuralNetwork (int iNbrNNInputs, int [] aiNbrNeuronsByLayer, double [] adBiasByLayer,  double dLearningRate)	{
+		
+		if (aiNbrNeuronsByLayer.length != adBiasByLayer.length) throw new RuntimeException("Mismatch params in NeuralNetwork constructor");
+
+		this.m_aLayer = new Layer[aiNbrNeuronsByLayer.length];
+		m_dLearningRate = dLearningRate;
+		
+		int iNbrLayerInputs = iNbrNNInputs;
+		for (int iLayer=0; iLayer < aiNbrNeuronsByLayer.length; iLayer++)
+		{
+			//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
+			m_aLayer[iLayer] = new Layer(iLayer, iNbrLayerInputs, aiNbrNeuronsByLayer[iLayer], adBiasByLayer[iLayer]);
+			iNbrLayerInputs = aiNbrNeuronsByLayer[iLayer];
+		}
+	}
 	
+	public NeuralNetwork (int iNbrNNInputs, double dLearningRate)	{
+		
+		m_iNbrNNInputs = iNbrNNInputs;
+		m_dLearningRate = dLearningRate;
+	}
+	
+	public void addLayer(int iNbrNeurons, double adBias)
+	{
+		
+		
+	}
+
 	public void setWeights(int iLayer, double [][] aadWeights)
 	{
 		m_aLayer[iLayer].setWeights(aadWeights);
@@ -73,7 +98,7 @@ public class NeuralNetwork {
 		return aadACT;
 	}
 	
-	public static void useMinstData()
+	public static void testMinstData()
 	{
 		double dBias = 0.1; 
 		final double dLEARNING_RATE = 0.1;
@@ -178,7 +203,10 @@ public class NeuralNetwork {
 
 
 	public static void test1()
-	{
+	{	//BUILING THIS NEURAL NETWORK TO VERIFY SAME RESULTS:
+		//	https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+		
+		
 		final int iNBR_NEURONS_LAYER_0 = 2; // THIS IN THE ONLY HIDDEN LAYER
 		final int iNBR_NEURONS_LAYER_1 = 2; // THIS IS OUPUT LAYER 
 		final double dLAYER_0_BIAS = 0.35;
@@ -198,29 +226,41 @@ public class NeuralNetwork {
         
 		double[][] aadWeights0 = {{0.15,0.2},{0.25,0.3}} ;
 		double[][] aadWeights1 = {{0.4,0.45},{0.5,0.55}} ;
-		aLayer[0].setWeights(aadWeights0);
-		aLayer[1].setWeights(aadWeights1);
+		nn.setWeights(0, aadWeights0);
+		nn.setWeights(1, aadWeights1);
 				
 		double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
 		//ArrayUtil.show(aadReturn, "aadReturn", "%9.5f");
   	}
 
-/*	public NeuralNetwork (int iNbrInputs, double dLearningRate)
-	{
-		this.m_dLearningRate = dLearningRate;
-		
-	}
 	
 	public static void test2()
 	{
+		final int iNBR_INPUTS = 2;
 		final int iNBR_NEURONS_LAYER_0 = 2; // THIS IN THE ONLY HIDDEN LAYER
 		final int iNBR_NEURONS_LAYER_1 = 2; // THIS IS OUPUT LAYER 
-		final double dLAYER_0_BIAS = 0.35;
-        final double dLAYER_1_BIAS = 0.60;
+		final double dBIAS_LAYER_0 = 0.35;
+        final double dBIAS_LAYER_1 = 0.60;
+        final double dLEARNING_RATE = 0.5;
+
+        //CREATE ARRAYS TO PASS IN NUMBER NEURONS/LAYER AND BIAS FOR EACH LAYER
+        //THIS NN HAS 1 HIDDEN & 1 OUTPUT LAYER SO SIZE OF EACH ARRAY IS 2
+        int [] aiNbrNeuronsByLayer = {iNBR_NEURONS_LAYER_0 , iNBR_NEURONS_LAYER_1 };
+        double [] adBiasByLayer = { dBIAS_LAYER_0 , dBIAS_LAYER_1 };
         
-        NeuralNetwork nn = new NeuralNetwork(); 
- 
-	}*/
+        NeuralNetwork nn = new NeuralNetwork(iNBR_INPUTS, aiNbrNeuronsByLayer, adBiasByLayer, dLEARNING_RATE); 
+		
+        double[][] aadWeights0 = {{0.15,0.2},{0.25,0.3}} ;
+		double[][] aadWeights1 = {{0.4,0.45},{0.5,0.55}} ;
+		nn.setWeights(0, aadWeights0);
+		nn.setWeights(1, aadWeights1);
+		
+      	double[] adInput = {0.05,0.1};  
+      	double[] adTarget = {0.01,0.99};  
+
+		double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
+
+	}
 
 	
 }

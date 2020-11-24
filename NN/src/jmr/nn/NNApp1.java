@@ -68,8 +68,8 @@ public class NNApp1 {
 		System.out.println("NNApp1.test1 method");
 		//Neuron.test2();
 		//Layer.test1();
-	//	NeuralNetwork.test1();
-		NeuralNetwork.useMinstData();
+		NeuralNetwork.test2();
+	//	NeuralNetwork.testMinstData();
 	//	TestClass tc = new TestClass();
 	//	tc.test();
 	}

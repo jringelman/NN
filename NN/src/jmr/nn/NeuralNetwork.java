@@ -53,7 +53,7 @@ public class NeuralNetwork {
 		m_aLayer[iLayer].setWeights(aadWeights);
 	}
 	
-	public double [] activateNN(double [] adInput, double [] adTarget) {
+	public double [] query(double [] adInput) {
 		double [] adACT = adInput;
 		
 		//FEEDFORWARD - ACTIVATE EACH LAYER GOING FORWARD
@@ -61,7 +61,7 @@ public class NeuralNetwork {
 			adACT = m_aLayer[iLayer].activate(adInput);
 			adInput = adACT; //INPUT FOR NEXT LAYER IS ACTIVATION OUTPUT FROM PRIOR LAYER.
 		}
-		return adACT;
+		return adACT; //RETURNS FINAL OUTPUT
 	}
 
 	public double [][] trainNetwork(double [] adInput, double [] adTarget){
@@ -171,29 +171,25 @@ public class NeuralNetwork {
 		System.out.println(listTestImages.size() + " Test Images");
     	
 		int iCorrect =0;
-		int iWrong = 0;
+		//int iWrong = 0;
 		
-		for (int i=0; i<aiTestLabels.length; i++) {
-			
-
-			double[] adTarget = MnistReader.createTarget(aiTestLabels[i]);
-			
+		for (int i=0; i<aiTestLabels.length; i++) {			
 			int[][] aaiImage = listTestImages.get(i);
 			int [] aiImageFlat = MnistReader.flat(aaiImage);
 			double[] adInput = MnistReader.scaleImagePixels(aiImageFlat);
 
-			double [] adOutput = nn.activateNN(adInput, adTarget);
+			double [] adOutput = nn.query(adInput);
 			int iNNGuess = ArrayUtil.maxValueIndex(adOutput);
 			if(iNNGuess ==  aiTestLabels[i])
 				iCorrect++;
-			else
-				iWrong++;
+			//else
+			//	iWrong++;
 		//	StdOut.printf("Test Label Target: %d  NN Guess: %d\n", aiTestLabels[i], iNNGuess);
 		//	ArrayUtil.show(adOutput, "NN Output");
 		//	String sImage = MnistReader.renderImage(aaiImage);
 		//	System.out.println(sImage);
 		} 
-		StdOut.printf("Total Images Trained: %d Correct: %d  Wrong: %d Accuracy %5.1f%%\n",(iCorrect + iWrong), iCorrect, iWrong, (double)iCorrect/(double)(iCorrect + iWrong)*100.0);
+		StdOut.printf("Total Images Trained: %d Correct: %d  Wrong: %d Accuracy %5.1f%%\n",aiTestLabels.length, iCorrect, aiTestLabels.length - iCorrect, (double)iCorrect/(double) aiTestLabels.length * 100.0);
 //		StdOut.printf("Correct: %d  Wrong: %d  Total:%d\n", iCorrect, iWrong, (iCorrect + iWrong) );
 
     	}catch(Exception e){System.out.println(e);}   

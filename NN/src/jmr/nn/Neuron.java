@@ -93,7 +93,7 @@ public class Neuron {
 		ArrayUtil.show(adNETdW,"adNETdW");
 		ArrayUtil.show(adETdW,"adETdW");
 		String sLabel = "Neuron " + m_iLayerNbr + ":" + m_iNeuronNbr + " New Weights";*/
-		ArrayUtil.show(adNewWeights,"Neuron " + m_iLayerNbr + ":" + m_iNeuronNbr + " New Weights");
+	//	ArrayUtil.show(adNewWeights,"Neuron " + m_iLayerNbr + ":" + m_iNeuronNbr + " New Weights");
 				
 		/*
 		COMPUTE dET/dACT TO BE USED BY upstream layers (returns one value for each weight) 

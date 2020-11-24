@@ -72,7 +72,7 @@ public class NNApp1 {
 		final int iNBR_INPUTS = 784; //28 x 28 pixels = 784 pixels
 		final int iNBR_NEURONS_LAYER0 = 20; // THIS IN THE ONLY HIDDEN LAYER
 		final int iNBR_NEURONS_LAYER1 = 10; // THIS IS OUPUT LAYER WITH EACH NODE FOR DIGITS 0 THRU 9;
-		final int iNBR_EPOCHS = 5;
+		final int iNBR_EPOCHS = 1;
 		
 		NNLayer [] aLayer = new NNLayer[2];
 		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
@@ -148,7 +148,7 @@ public class NNApp1 {
 			if(iNNGuess ==  aiTestLabels[i])
 				iCorrect++;
 		//	StdOut.printf("Test Label Target: %d  NN Guess: %d\n", aiTestLabels[i], iNNGuess);
-		//	ArrayUtil.show(adOutput, "NN Output");
+		//	ArrayUtil.show(adOutput, "NN Output", "%8.5f");
 		//	String sImage = MnistReader.renderImage(aaiImage);
 		//	System.out.println(sImage);
 		} 

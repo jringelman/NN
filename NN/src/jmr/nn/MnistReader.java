@@ -131,7 +131,10 @@ public class MnistReader {
 		return adTarget;
 	}
 	
-//************ STATIC TEST METHODS *****************
+	//**************************************************
+	//************ STATIC TEST METHODS *****************
+	//**************************************************
+
 	
 	
 	public static void test()

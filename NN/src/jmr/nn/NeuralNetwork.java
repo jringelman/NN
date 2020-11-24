@@ -2,58 +2,52 @@ package jmr.nn;
 
 import java.nio.file.Paths;
 import java.util.List;
-
 import jmr.util.AppProperties;
-
 import jmr.util.ArrayUtil;
 import jmr.util.StdOut;
 
-/* NeuralNetwork uses these other classes: Layer, Neuron, Matrix, StdOut
+/* NeuralNetwork is composed of 1 or more NNLayers which are composed of Neurons.
+ * There is no input layer. Inputs are simply passed to the first layer
+ * The last layer is the output layer. Prior layers are hidden layers.
+ * By default, the initial weights for each neuron are randomly generated. For debugging, the weights can be overidden.
+ * The neurons use a sigmoid activation function.
  */
 
 public class NeuralNetwork {
 	
-	Layer [] m_aLayer;
+	NNLayer [] m_aLayer;
 	double m_dLearningRate;
 	int m_iNbrNNInputs;
 	
 	//THERE ARE 2 WAYS TO CREATE NeuralNetwork
 	
-	//METHOD 1 IS TO CREATE THE LAYERS THEN PASS THEM IN
-	public NeuralNetwork(Layer [] aLayers, double dLearningRate){
+	//METHOD 1 IS TO CREATE THE NNLAYERS THEN PASS THEM IN
+	public NeuralNetwork(NNLayer [] aLayers, double dLearningRate){
 		m_aLayer =  aLayers;
 		m_dLearningRate = dLearningRate;
 	}
 	
-	//METHOD 2 IS TO PASS IN ARRAYS WITH THE LAYOUT OF THE NEURONS AND THE ASSOCIATED BIASES AND LET NeuralNetwork CREATE THE LAYERS
+	//METHOD 2 IS TO PASS IN AN ARRAY WITH THE NBR OF LAYERS/NEURONS AND AN ARRAY W/ THE BIASES AND LET NeuralNetwork CREATE THE LAYERS
+	//THE aiNbrNeuronsByLayer ARRAY WOULD LOOK LIKE THIS FOR NN  A HIDDEN LAYER W/ 4 NEURONS AND AN OUTPUT LAYER W/ 3 NEURONS
+	//	 aiNbrNeuronsByLayer = {4,3}  ==> THE NUMBER OF ELEMENTS IS EQUAL TO NUMBER OF LAYERS, EACH VALUE IS THE NBR NEURONS IN THAT LAYER
+	// THE 	adBiasByLayer MUST HAVE SAME NBR OF ELEMENTS e.g. adBiasByLayer	{0.35, 0.60} FOR 2 LAYERS
+	//FOR 3 LAYERS, aiNbrNeuronsByLayer & adBiasByLayer WOULD HAVE 3 ELEMENTS  
+	//		aiNbrNeuronsByLayer = {5,10,3}  adBiasByLayer = {0.25, 0.3, 0.15}
 	public NeuralNetwork (int iNbrNNInputs, int [] aiNbrNeuronsByLayer, double [] adBiasByLayer,  double dLearningRate)	{
-		
 		if (aiNbrNeuronsByLayer.length != adBiasByLayer.length) throw new RuntimeException("Mismatch params in NeuralNetwork constructor");
 
-		this.m_aLayer = new Layer[aiNbrNeuronsByLayer.length];
+		this.m_aLayer = new NNLayer[aiNbrNeuronsByLayer.length];
 		m_dLearningRate = dLearningRate;
 		
 		int iNbrLayerInputs = iNbrNNInputs;
 		for (int iLayer=0; iLayer < aiNbrNeuronsByLayer.length; iLayer++)
 		{
 			//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
-			m_aLayer[iLayer] = new Layer(iLayer, iNbrLayerInputs, aiNbrNeuronsByLayer[iLayer], adBiasByLayer[iLayer]);
+			m_aLayer[iLayer] = new NNLayer(iLayer, iNbrLayerInputs, aiNbrNeuronsByLayer[iLayer], adBiasByLayer[iLayer]);
 			iNbrLayerInputs = aiNbrNeuronsByLayer[iLayer];
 		}
 	}
 	
-	public NeuralNetwork (int iNbrNNInputs, double dLearningRate)	{
-		
-		m_iNbrNNInputs = iNbrNNInputs;
-		m_dLearningRate = dLearningRate;
-	}
-	
-	public void addLayer(int iNbrNeurons, double adBias)
-	{
-		
-		
-	}
-
 	public void setWeights(int iLayer, double [][] aadWeights)
 	{
 		m_aLayer[iLayer].setWeights(aadWeights);
@@ -97,6 +91,11 @@ public class NeuralNetwork {
 		}
 		return aadACT;
 	}
+
+//**************************************************
+//************ STATIC TEST METHODS *****************
+//**************************************************
+
 	
 	public static void testMinstData()
 	{
@@ -107,10 +106,10 @@ public class NeuralNetwork {
 		final int iNBR_NEURONS_LAYER1 = 10; // THIS IS OUPUT LAYER WITH EACH NODE FOR DIGITS 0 THRU 9;
 		final int iNBR_EPOCHS = 1;
 	      	
-		Layer [] aLayer = new Layer[2];
+		NNLayer [] aLayer = new NNLayer[2];
 		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
-	    aLayer[0] = new Layer(0, iNBR_INPUTS, iNBR_NEURONS_LAYER0, dBias);
-	    aLayer[1] = new Layer(1, iNBR_NEURONS_LAYER0, iNBR_NEURONS_LAYER1, dBias);
+	    aLayer[0] = new NNLayer(0, iNBR_INPUTS, iNBR_NEURONS_LAYER0, dBias);
+	    aLayer[1] = new NNLayer(1, iNBR_NEURONS_LAYER0, iNBR_NEURONS_LAYER1, dBias);
 	    NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
 
 	    //TRAIN THE NN WITH MINST DATA
@@ -203,7 +202,7 @@ public class NeuralNetwork {
 
 
 	public static void test1()
-	{	//BUILING THIS NEURAL NETWORK TO VERIFY SAME RESULTS:
+	{	//BUILDING THIS NEURAL NETWORK TO VERIFY SAME RESULTS:
 		//	https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
 		
 		
@@ -216,11 +215,11 @@ public class NeuralNetwork {
       	double[] adTarget = {0.01,0.99};  
         final double dLEARNING_RATE = 0.5;
       	
-		Layer [] aLayer = new Layer[2];
+		NNLayer [] aLayer = new NNLayer[2];
 
 		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
-        aLayer[0] = new Layer(0, adInput.length, iNBR_NEURONS_LAYER_0, dLAYER_0_BIAS);
-        aLayer[1] = new Layer(1, iNBR_NEURONS_LAYER_0, iNBR_NEURONS_LAYER_1, dLAYER_1_BIAS);
+        aLayer[0] = new NNLayer(0, adInput.length, iNBR_NEURONS_LAYER_0, dLAYER_0_BIAS);
+        aLayer[1] = new NNLayer(1, iNBR_NEURONS_LAYER_0, iNBR_NEURONS_LAYER_1, dLAYER_1_BIAS);
 
         NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
         
@@ -236,6 +235,9 @@ public class NeuralNetwork {
 	
 	public static void test2()
 	{
+		//BUILDING THIS NEURAL NETWORK TO VERIFY SAME RESULTS:
+		//	https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+				
 		final int iNBR_INPUTS = 2;
 		final int iNBR_NEURONS_LAYER_0 = 2; // THIS IN THE ONLY HIDDEN LAYER
 		final int iNBR_NEURONS_LAYER_1 = 2; // THIS IS OUPUT LAYER 

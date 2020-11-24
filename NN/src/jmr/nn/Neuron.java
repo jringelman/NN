@@ -9,20 +9,12 @@ public class Neuron {
 	
 	int m_iLayerNbr;
 	int	m_iNeuronNbr;
-//	String m_sId;
 	double m_adWeights[];
 	double m_adInputs[];
-	double m_dNet;
-	double m_dAct;
+	double m_dNet; //THE NET SUM OF INPUTS * WEIGHTS PLUS BIAS
+	double m_dAct; //NEURON ACTIVATION AFTER SIGMOID FUNCTION PERFORMED ON NET VALUE
 	
 	private final static Random random = new Random();
-	
-	/*
-	public Neuron (double [] adWeights, int iLayerNbr, int iNodeNbr) {
-		m_adWeights = adWeights.clone(); 
-		m_iLayerNbr = iLayerNbr;
-		m_iNeuronNbr = iNodeNbr;
-	}*/
 	
 	public Neuron (int iLayerNbr, int iNeuronNbr, int nNbrInputs) {
 		m_iLayerNbr = iLayerNbr;
@@ -49,11 +41,11 @@ public class Neuron {
 	}
 	
 	//SETTING WEIGHTS IS USED FOR TESTING; IT OVERIDES THE randomizeWeights SET IN THE CONSTRUCTOR
-	public void setWeights(double [] adWeights){
+	protected void setWeights(double [] adWeights){
 		m_adWeights = adWeights.clone();	
 	}
 	
-	public double activate(double [] adInputs, double dBias){
+	protected double activate(double [] adInputs, double dBias){
 		if (adInputs.length != m_adWeights.length) throw new RuntimeException("Mismatch params in NNNode.activate");
 		
 		m_adInputs = adInputs.clone();
@@ -68,26 +60,23 @@ public class Neuron {
 	}
 	
 	//ONLY USED FOR OUTPUT LAYER NEURONS
-	public double computeError(double dTarget) {
+	protected double computeError(double dTarget) {
 		double dError = 0.5 * (dTarget - m_dAct)*(dTarget - m_dAct);
 	//	StdOut.printf("Neuron %d:%d Error = %9.5f\n", m_iLayerNbr, m_iNeuronNbr, dError);
 		return dError;
 	}
 	
-	public double [] computeNewWeights(double dETdACT, double dLearningRate) {
+	protected double [] computeNewWeights(double dETdACT, double dLearningRate) {
 
 		/* COMPUTATION OF NEW WEIGHTS FOR THIS NEURON
-		 
-		  dET/dW = dNET/dW x dACT/dNET x dET/dACT
-			   dNET/dW : INPUT which is ACT from upstream or INPUT
-			   dACT/dNET: ACT x (1-ACT)
-			   dET/dACT: passed in; either (ACT-TARG) for output layer or calculated by downstream layer 
 
-	 		dET/dNET = dACT/dNET x dET/dACT      - JUST CONSOLIDATES THIS TERM FOR USE
-				so
-			dET/dW = dNET/dW x dET/dNET
-		
-			NEW WEIGHTS = W - LearningRate * dET/dW
+		NEW WEIGHT = Current Weight - LearningRate * dET/dW
+
+		  dET/dW = dNET/dW x        dET/dNET 
+		  dET/dW = dNET/dW x (dACT/dNET x dET/dACT) 
+			 -   dNET/dW : INPUT which is ACT from upstream neurons or NN INPUT if 1st hidden layer
+			 -   dACT/dNET: ACT x (1-ACT)
+			 -   dET/dACT: passed in; either (ACT-TARG) for output layer or calculated by downstream layer 
 		*/
 		
 		double dACTdNET = m_dAct*(1-m_dAct);
@@ -123,8 +112,13 @@ public class Neuron {
 		m_adWeights = adNewWeights.clone();
 		return adEdACTupstrm;  //THIS VALUE WILL BE USED BY UPSTREAM LAYERS FOR COMPUTING NEW WEIGHTS
 	}
-/************ STATIC TEST METHODS ************/
 	
+	
+	
+//**************************************************
+//************ STATIC TEST METHODS *****************
+//**************************************************
+
 	public static void test1()
 	{
         final int iLAYER_NBR = 0;
@@ -147,23 +141,22 @@ public class Neuron {
 	}
 	
 	public static void test2() {
+	    final int iLAYER_NBR = 0;
+	    final int iNEURON_NBR = 0;
+	    final int iNBR_OF_INPUTS = 3;
 	
-    final int iLAYER_NBR = 0;
-    final int iNEURON_NBR = 0;
-    final int iNBR_OF_INPUTS = 3;
-
-	Neuron neuron = new Neuron(iLAYER_NBR, iNEURON_NBR, iNBR_OF_INPUTS);
-
-	double[] adWeights = {0.1, 0.3, 0.5};
-	neuron.setWeights(adWeights);
-			
-    double adBias = 0.5; 
-	double[] adInputs = {1.0, 4.0, 5.0};
+		Neuron neuron = new Neuron(iLAYER_NBR, iNEURON_NBR, iNBR_OF_INPUTS);
 	
-	double dActivation = neuron.activate(adInputs, adBias);
-	double dExpectedNet = adInputs[0] * adWeights[0] + adInputs[1] * adWeights[1] + adInputs[2] * adWeights[2]  + adBias;
-	double dExpectedAct = 1/(1+Math.exp(-dExpectedNet));
-	System.out.println("Activation = " + dActivation + "; Expected = " + dExpectedAct);
+		double[] adWeights = {0.1, 0.3, 0.5};
+		neuron.setWeights(adWeights);
+				
+	    double adBias = 0.5; 
+		double[] adInputs = {1.0, 4.0, 5.0};
+		
+		double dActivation = neuron.activate(adInputs, adBias);
+		double dExpectedNet = adInputs[0] * adWeights[0] + adInputs[1] * adWeights[1] + adInputs[2] * adWeights[2]  + adBias;
+		double dExpectedAct = 1/(1+Math.exp(-dExpectedNet));
+		System.out.println("Activation = " + dActivation + "; Expected = " + dExpectedAct);
 	}
 }
 

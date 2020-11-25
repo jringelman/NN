@@ -37,7 +37,7 @@ public class MnistReader {
 		final int iNBR_INPUTS = 784; //28 x 28 pixels = 784 pixels
 		final int iNBR_NEURONS_LAYER0 = 200; // THIS IN THE ONLY HIDDEN LAYER
 		final int iNBR_NEURONS_LAYER1 = 10; // THIS IS OUPUT LAYER WITH EACH NODE FOR DIGITS 0 THRU 9;
-		final int iNBR_EPOCHS = 1;
+		final int iNBR_EPOCHS = 5;
 		
 		NNLayer [] aLayer = new NNLayer[2];
 		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)

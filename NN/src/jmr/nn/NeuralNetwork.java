@@ -65,13 +65,13 @@ public class NeuralNetwork {
 
 	public double trainNetwork(double [] adInput, double [] adTarget){
 		double [] adACT = adInput;
-		double [][] aadACT = new double [2][];
+		//double [][] aadACT = new double [m_aLayer.length][];
 		
 		//FEEDFORWARD - ACTIVATE EACH LAYER GOING FORWARD
 		for (int iLayer=0; iLayer<m_aLayer.length; iLayer++) {
 			adACT = m_aLayer[iLayer].activate(adInput);
 			adInput = adACT; //INPUT FOR NEXT LAYER IS ACTIVATION OUTPUT FROM PRIOR LAYER.
-			aadACT[iLayer] = adACT.clone();
+			//aadACT[iLayer] = adACT.clone();
 			//ArrayUtil.show(adACT, "adACT for Layer " + iLayer);
 		}
 		
@@ -90,6 +90,8 @@ public class NeuralNetwork {
 		return dErrorTotal;
 	}
 
+	
+	
 	
 //*********************************************************
 //************ STATIC METHODS FOR TESTING *****************

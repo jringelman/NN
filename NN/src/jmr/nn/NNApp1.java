@@ -8,14 +8,15 @@ import java.util.List;
 import java.text.SimpleDateFormat;
 import jmr.util.Log;
 import jmr.util.StdOut;
+import jmr.nn.MarketData.Price;
 import jmr.util.AppProperties;
 import jmr.util.ArrayUtil;
+
 
 //MUST PASS IN FULL PATH TO PROPERTIES FILE
 //    e.g ==>  /Users/JMR/Dropbox/projects/git/repository/AppTestJava/AppTestMain.properties
 
-//THIS IMPLEMENTATION JUST USING STATIC METHOD SO NO INSTANCE CREATED.
-// CAN CREATE INSTANCE IF DESIRED.
+//THIS IMPLEMENTATION JUST USING STATIC METHOD SO NO INSTANCE CREATED. CAN CREATE INSTANCE IF DESIRED.
 
 public class NNApp1 {
 	
@@ -31,9 +32,14 @@ public class NNApp1 {
 		try	{AppProperties.loadProperties(sPropertiesFile);}catch (Exception e) {System.out.println(e);}
 		
 		//openLogFile();
-		
-		testMinstData();
+	
+			MnistReader.runMinstDataSet();
+		//testMinstData();
+		//testStockData();
 
+		//MarketData md = new MarketData();
+	//	md.runNNusingPrices();
+	
 		//CAN USE CONSTRUCTOR OR JUST USE STATIC METHODS
 		//	new AppTestMain();
 	}
@@ -64,6 +70,8 @@ public class NNApp1 {
 	//**************************************************
 	//************ STATIC TEST METHODS *****************
 	//**************************************************
+	
+	/*
 	
 	public static void testMinstData()
 	{
@@ -156,6 +164,6 @@ public class NNApp1 {
 
     	}catch(Exception e){System.out.println(e);}   
 	
-	}
+	}*/
 	
 }

@@ -26,8 +26,12 @@ import java.util.Arrays;
 
 public class MnistReader {
 	
+	static final String m_sDATA_PATH = "./data/mnist/";
+
 	public static void runMinstDataSet()
 	{
+		System.out.println("BEGINNING NEURAL NETWORK ON MNIST DATA");
+
 		double dBias = 0.1; 
 		final double dLEARNING_RATE = 0.1;
 		final int iNBR_INPUTS = 784; //28 x 28 pixels = 784 pixels
@@ -41,14 +45,8 @@ public class MnistReader {
 	    aLayer[1] = new NNLayer(1, iNBR_NEURONS_LAYER0, iNBR_NEURONS_LAYER1, dBias);
 	    NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
 
-	    //TRAIN THE NN WITH MINST DATA
-	    String sMinstDataPath = "";
-		try{
-			sMinstDataPath = AppProperties.getProperty("dir.mnistdata");
-		}catch (Exception e) {System.out.println(e);}
-
-    	String sFileTrainLabels = sMinstDataPath + "train-labels-idx1-ubyte.gz";
-    	String sFileTrainImages = sMinstDataPath + "train-images-idx3-ubyte.gz";
+    	String sFileTrainLabels = m_sDATA_PATH + "train-labels-idx1-ubyte.gz";
+    	String sFileTrainImages = m_sDATA_PATH + "train-images-idx3-ubyte.gz";
 
     	try{
     		 
@@ -86,8 +84,8 @@ public class MnistReader {
 	  	}catch(Exception e){System.out.println(e);}   
 
     	//RUN THE MINST TEST DATA
-    	String sFileTestLabels = sMinstDataPath + "t10k-labels-idx1-ubyte.gz";
-    	String sFileTestImages = sMinstDataPath + "t10k-images-idx3-ubyte.gz";
+    	String sFileTestLabels = m_sDATA_PATH + "t10k-labels-idx1-ubyte.gz";
+    	String sFileTestImages = m_sDATA_PATH + "t10k-images-idx3-ubyte.gz";
 
     	try{
     	
@@ -116,6 +114,7 @@ public class MnistReader {
 		StdOut.printf("Total Images Tested: %d Correct: %d  Wrong: %d Accuracy %5.1f%%\n",aiTestLabels.length, iCorrect, aiTestLabels.length - iCorrect, (double)iCorrect/(double) aiTestLabels.length * 100.0);
 
     	}catch(Exception e){System.out.println(e);}   
+		System.out.println("COMPLETED NEURAL NETWORK ON MNIST DATA\n");
 	}
 	
 	

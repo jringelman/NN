@@ -15,17 +15,15 @@ import jmr.util.StdOut;
 public class MarketData {
 	
 //	static final String m_sDATA_FILE = "/Users/JMR/Dropbox/projects/data/sp500 1927-12 to 2020-11-23.csv";
-	static final String m_sDATA_FILE = "./data/sp500 1927-12 to 2020-11-23.csv";
+	static final String m_sDATA_FILE = "./data/market/sp500 1927-12 to 2020-11-23.csv";
 	static final int m_nDATA_SET_SIZE = 100;
 	static final double m_dTRAIN_DATA_PCT = 0.99;
 	static final int m_nPREDICT_DAYS_IN_FUTURE = 1;
-//	static final int m_nSCALE_FACTOR = ;
 	final int m_nNBR_EPOCHS = 1;
 	
 	public class Price{
 		public String m_sDate;
 		public double m_dPrice;
-//		public double m_dPctChg;
 
 		public Price(String sDate, double dPrice){
 			m_sDate = sDate;
@@ -50,6 +48,7 @@ public class MarketData {
 
 	public void runNNusingPrices()
 	{
+		System.out.println("BEGINNING NEURAL NETWORK ON MARKET DATA");
 		//LOAD PRICES INTO AN ARRAY
 		double [] aPrice = loadPriceArray();
 		System.out.println("aPrice.length= " + aPrice.length);
@@ -121,10 +120,10 @@ public class MarketData {
 				double dErrorThisTrain = nn.trainNetwork(aadTrainDataSets[i], aadTrainTargets[i]);
 				dErrorForEpoch += dErrorThisTrain;
 				if(((i+1) % 1000) == 0) {
-					StdOut.printf("%d Images trained for Epoch %d  TotalError=%9.6f\n",(i+1),iEpoch, dErrorThisTrain);
+					StdOut.printf("%d data sets trained for Epoch %d  TotalError=%9.6f\n",(i+1),iEpoch, dErrorThisTrain);
 				}
 			}
-			StdOut.printf("Epoch %d completed with average Error= %9.6f\n\n", iEpoch, dErrorForEpoch/(double)aadTrainDataSets.length);
+			StdOut.printf("Training Epoch %d completed with average Error= %9.6f\n\n", iEpoch, dErrorForEpoch/(double)aadTrainDataSets.length);
 		} 
 		
 		//TEST NETWORK
@@ -136,7 +135,8 @@ public class MarketData {
 			
 			StdOut.printf("DataSet %d  Predicted=%9.6f  Actual=%9.6f  Delta=%9.6f\n",i, dNNGuess,aadTestTargetsScaled[i][0],(dNNGuess- aadTestTargetsScaled[i][0]) );
 	
-		} 		
+		} 
+		System.out.println("COMPLETED NEURAL NETWORK ON MARKET DATA\n");
 	}
 	
 	protected NeuralNetwork createNN()

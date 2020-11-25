@@ -16,14 +16,34 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>data/sp500 1927-12 to 2020-11-23.csv</name>
-			<type>1</type>
-			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/data/sp500 1927-12 to 2020-11-23.csv</location>
-		</link>
-		<link>
 			<name>src/NN.properties</name>
 			<type>1</type>
 			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/NN.properties</location>
+		</link>
+		<link>
+			<name>data/market/sp500 1927-12 to 2020-11-23.csv</name>
+			<type>1</type>
+			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/data/market/sp500 1927-12 to 2020-11-23.csv</location>
+		</link>
+		<link>
+			<name>data/mnist/t10k-images-idx3-ubyte.gz</name>
+			<type>1</type>
+			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/data/mnist/t10k-images-idx3-ubyte.gz</location>
+		</link>
+		<link>
+			<name>data/mnist/t10k-labels-idx1-ubyte.gz</name>
+			<type>1</type>
+			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/data/mnist/t10k-labels-idx1-ubyte.gz</location>
+		</link>
+		<link>
+			<name>data/mnist/train-images-idx3-ubyte.gz</name>
+			<type>1</type>
+			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/data/mnist/train-images-idx3-ubyte.gz</location>
+		</link>
+		<link>
+			<name>data/mnist/train-labels-idx1-ubyte.gz</name>
+			<type>1</type>
+			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/data/mnist/train-labels-idx1-ubyte.gz</location>
 		</link>
 	</linkedResources>
 </projectDescription>

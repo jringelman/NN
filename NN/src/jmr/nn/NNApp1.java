@@ -34,8 +34,6 @@ public class NNApp1 {
 		//openLogFile();
 	
 			MnistReader.runMinstDataSet();
-		//testMinstData();
-		//testStockData();
 
 		//MarketData md = new MarketData();
 	//	md.runNNusingPrices();
@@ -60,7 +58,6 @@ public class NNApp1 {
 			fileLog.mkdirs();
 			Log.open(sLogPath + sFileName);
 			System.out.println("Log File Created: " + sLogPath + sFileName);
-		
 		}catch (Exception e) {
 			System.out.println(e);
 		}

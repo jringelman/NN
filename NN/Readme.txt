@@ -27,3 +27,26 @@ Examples:
 	java -cp ./bin/ jmr.nn.NNApp1 MNIST
 	java -cp ./bin/ jmr.nn.NNApp1 MARKET
       
+     
+      
+CLASSES OVERVIEW
+
+APPLICATION CLASS
+	- jmr.nn.NNApp1 (has main function)
+
+CORE NEURAL NETWORK CLASSES
+	- jmr.nn.NeuralNetwork (contains 1 or more NNLayers)
+	- jmr.nn.NNLayer (contains 1 or more Neurons)
+	- jmr.nn.Neuron
+	
+DATA LOADING CLASSES
+	- jmr.nn.MnistReader (reads mnist data and loads into NeuralNetwork for training and testing)
+	- jmr.nn.MarketData  (reads historical SP500 price data and loads into NeuralNetwork for training and testing)
+	
+UTILITY CLASSES
+	- jmr.util.ArrayUtil (helper class for double arrays)
+	- jmr.util.StdOut (used for formatted printing)
+	- jmr.util.AppProperties (class to load from properties file) (NOT USED IN THIS VERSION)
+	- jmr.util.Log (log file class) (NOT USED IN THIS VERSION)
+		 	
+      

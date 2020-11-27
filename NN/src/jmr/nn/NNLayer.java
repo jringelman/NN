@@ -12,14 +12,6 @@ public class NNLayer {
 	int m_nNbrInputs;
 	double m_dBias;
 	
-	/*
-	public Layer(Neuron [] aNeurons, int nLayerNbr,  int nNbrInputs, double dBias)
-	{
-		m_aNeurons = aNeurons.clone();
-		m_nLayerNbr = nLayerNbr;
-		m_nNbrInputs = nNbrInputs;
-		m_dBias = dBias;
-	}*/
 	
 	public NNLayer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
 	{
@@ -27,7 +19,6 @@ public class NNLayer {
 		m_aNeurons = new Neuron[nNbrNeurons];
 		m_nNbrInputs = nNbrInputs;
 		m_dBias = dBias;
-		//public Neuron (int iLayerNbr, int iNeuronNbr, int nNbrInputs)
 		for(int iNeuronNbr=0; iNeuronNbr< nNbrNeurons; iNeuronNbr++)
 			m_aNeurons[iNeuronNbr] = new Neuron(nLayerNbr, iNeuronNbr, nNbrInputs);
 	}

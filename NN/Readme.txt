@@ -18,6 +18,7 @@ Historical data for SP500 for MARKET is stored here: ./data/market/
 PROPERTIES FILE
 Configure Neural Network for each data set in properties file.
 For example:
+	nn.mnist.run=1
 	nn.mnist.inputs=784 
 	nn.mnist.neurons=20,10
 	nn.mnist.bias=0.1,0.1
@@ -31,9 +32,10 @@ TO COMPILE APPLICATION
       javac -d ./bin/ -cp ./bin/ ./src/jmr/util/*.java ./src/jmr/nn/*.java 
 
 TO RUN APPLICATION
-From folder NN-master/NN/
+- modify NN.properties file and save changes.
+- open terminal and navigate to : NN-master/NN/
 	java -cp ./bin/ jmr.nn.NNApp1 
-	java -cp ./bin/ jmr.nn.NNApp1     
+     
      
       
 CLASSES OVERVIEW

@@ -147,26 +147,7 @@ public class MarketData {
 		} 
 		System.out.println("COMPLETED NEURAL NETWORK ON MARKET DATA\n");
 	}
-/*	
-	protected NeuralNetwork createNN()
-	{
-		//BUILD NN
-		double dBias = 0.1; 
-		final double dLEARNING_RATE = 0.1;
-		final int iNBR_INPUTS = m_nDATA_SET_SIZE; 
-		final int iNBR_NEURONS_LAYER0 = 200;  
-		final int iNBR_NEURONS_LAYER1 = 50; 
-		final int iNBR_NEURONS_LAYER2 = 1;  
-		//final int iNBR_EPOCHS = 1;
-		
-		NNLayer [] aLayer = new NNLayer[3];
-		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
-	    aLayer[0] = new NNLayer(0, iNBR_INPUTS, iNBR_NEURONS_LAYER0, dBias);
-	    aLayer[1] = new NNLayer(1, iNBR_NEURONS_LAYER0, iNBR_NEURONS_LAYER1, dBias);
-	    aLayer[2] = new NNLayer(2, iNBR_NEURONS_LAYER1, iNBR_NEURONS_LAYER2, dBias);
-	    NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
-	    return nn;
-	}*/
+
 
 	protected double [] pctChgDataSet(double [] adDataSet)
 	{

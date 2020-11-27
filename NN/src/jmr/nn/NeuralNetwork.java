@@ -20,7 +20,7 @@ public class NeuralNetwork {
 	double m_dLearningRate;
 	int m_iNbrInputs;
 	
-	//THERE ARE 2 WAYS TO CREATE NeuralNetwork
+	//THERE ARE 2 CONSTRUCTORS FOR CREATING NeuralNetwork
 	
 	//METHOD 1 IS TO CREATE THE NNLAYERS THEN PASS THEM IN
 	public NeuralNetwork(NNLayer [] aLayers, double dLearningRate){
@@ -51,6 +51,69 @@ public class NeuralNetwork {
 		}
 	}
 	
+// THIS LOADS PARAMS FROM PROPERTIES FILE AND USES METHOD 2 CONSTRUCTOR TO CREATE NN
+	// INPUTS FOR PROPERTIES FILE FOR 3 LAYER NN
+	//		nn.mnist.inputs=784
+	//		nn.mnist.neurons=10,20,30
+	//		nn.mnist.bias=0.1,0.2,0.3
+	//		nn.mnist.learningrate=0.5
+	//		nn.mnist.epochs=7
+	public static NeuralNetwork loadNNFromPropertiesFile(String sKey)
+	{
+		int iNbrLayers = 2;
+		int iNbrInputs = 10;
+		double dLearningRate = 0.1;
+		int [] aiNbrNeurons = new int[iNbrLayers];
+		double [] adBiases = new  double[iNbrLayers];
+			
+		String sKeyPrefix = "nn." + sKey + ".";
+		try {
+			iNbrInputs = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "inputs"));
+			
+			String sNeurons = AppProperties.getProperty(sKeyPrefix + "neurons");
+            String[] asNeuronByLayer = sNeurons.split(",");
+            
+			String sBiases = AppProperties.getProperty(sKeyPrefix + "bias");
+            String[] sBiasByLayer = sBiases.split(",");
+		
+			iNbrLayers = asNeuronByLayer.length;
+			
+			aiNbrNeurons = new int[iNbrLayers];
+			adBiases = new double[iNbrLayers];
+			for(int i=0; i<iNbrLayers; i++)
+			{
+				aiNbrNeurons[i] = Integer.parseInt(asNeuronByLayer[i]);
+				adBiases[i] = Double.parseDouble(sBiasByLayer[i]);
+			}
+			dLearningRate = Double.parseDouble(AppProperties.getProperty(sKeyPrefix + "learningrate"));
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		//CREATE THE NN AND RETURN
+		NeuralNetwork nn = new NeuralNetwork(iNbrInputs, aiNbrNeurons, adBiases, dLearningRate);
+		return nn;
+	}
+	
+	public String getDescription(){
+		String sDesc = "Inputs=" + this.m_iNbrInputs;
+		sDesc += " Layers=" + this.m_aLayer.length;
+		sDesc += " Neurons={";
+		for(int i=0; i<m_aLayer.length; i++) {
+			sDesc += m_aLayer[i].getNbrNeurons();
+			if(i < m_aLayer.length-1)
+				sDesc += ",";
+		}
+		sDesc += "} Biases={";
+		for(int i=0; i<m_aLayer.length; i++) {
+			sDesc += m_aLayer[i].getBias();
+			if(i < m_aLayer.length-1)
+				sDesc += ",";
+		}
+		sDesc += "} LearningRate=" + this.m_dLearningRate;
+		return sDesc;				
+	}
+
 	public void setWeights(int iLayer, double [][] aadWeights) {
 		m_aLayer[iLayer].setWeights(aadWeights);
 	}
@@ -94,104 +157,8 @@ public class NeuralNetwork {
 	}
 
 	
-	public String getDescription(){
-		String sDesc = "Inputs=" + this.m_iNbrInputs;
-		sDesc += " Layers=" + this.m_aLayer.length;
-		sDesc += " Neurons={";
-		for(int i=0; i<m_aLayer.length; i++) {
-			sDesc += m_aLayer[i].getNbrNeurons();
-			if(i < m_aLayer.length-1)
-				sDesc += ",";
-		}
-		sDesc += "} Biases={";
-		for(int i=0; i<m_aLayer.length; i++) {
-			sDesc += m_aLayer[i].getBias();
-			if(i < m_aLayer.length-1)
-				sDesc += ",";
-		}
-		sDesc += "} LearningRate=" + this.m_dLearningRate;
-		return sDesc;				
-	}
 
-
-	// INPUTS FOR PROPERTIES FILE FOR 3 LAYER NN
-	//		nn.mnist.inputs=784
-	//		nn.mnist.neurons=10,20,30
-	//		nn.mnist.bias=0.1,0.2,0.3
-	//		nn.mnist.learningrate=0.5
-	//		nn.mnist.epochs=7
-	public static NeuralNetwork loadNNFromPropertiesFile(String sKey)
-	{
-		int iNbrLayers = 2;
-		int iNbrInputs = 10;
-		double dLearningRate = 0.1;
-		int [] aiNbrNeurons = new int[iNbrLayers];
-		double [] adBiases = new  double[iNbrLayers];
-			
-		String sKeyPrefix = "nn." + sKey + ".";
-		try {
-			iNbrInputs = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "inputs"));
-			
-			String sNeurons = AppProperties.getProperty(sKeyPrefix + "neurons");
-            String[] asNeuronByLayer = sNeurons.split(",");
-            
-			String sBiases = AppProperties.getProperty(sKeyPrefix + "bias");
-            String[] sBiasByLayer = sBiases.split(",");
 		
-			iNbrLayers = asNeuronByLayer.length;
-			
-			aiNbrNeurons = new int[iNbrLayers];
-			adBiases = new double[iNbrLayers];
-			for(int i=0; i<iNbrLayers; i++)
-			{
-				aiNbrNeurons[i] = Integer.parseInt(asNeuronByLayer[i]);
-				adBiases[i] = Double.parseDouble(sBiasByLayer[i]);
-			}
-			dLearningRate = Double.parseDouble(AppProperties.getProperty(sKeyPrefix + "learningrate"));
-		}
-		catch (Exception e) {
-			System.out.println(e);
-		}
-	
-	//	public NeuralNetwork (int iNbrNNInputs, int [] aiNbrNeuronsByLayer, double [] adBiasByLayer,  double dLearningRate)	{
-		NeuralNetwork nn = new NeuralNetwork(iNbrInputs, aiNbrNeurons, adBiases, dLearningRate);
-		return nn;
-	}
-
-	/*public static NeuralNetwork loadNNFromPropertiesFile2(String sID)
-	{
-		int iNbrLayers = 2;
-		int iNbrInputs = 10;
-		double dLearningRate = 0.1;
-		int iNbrEpochs = 1;
-		int [] aiNbrNeurons = new int[iNbrLayers];
-		double [] adBiases = new  double[iNbrLayers];
-			
-		String sKeyPrefix = "nn." + sID + ".";
-		try {
-			iNbrInputs = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "inputs"));
-			iNbrLayers = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "layers"));
-			aiNbrNeurons = new int[iNbrLayers];
-			adBiases = new double[iNbrLayers];
-			for(int i=0; i<iNbrLayers; i++)
-			{
-				aiNbrNeurons[i] = Integer.parseInt(AppProperties.getProperty(sKeyPrefix+ "layer." + i + "." + "neurons"));
-				adBiases[i] = Double.parseDouble(AppProperties.getProperty(sKeyPrefix+ "layer." + i + "." + "bias"));
-			}
-			dLearningRate = Double.parseDouble(AppProperties.getProperty(sKeyPrefix + "learningrate"));
-			iNbrEpochs = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "epochs"));
-		}
-		catch (Exception e) {
-			System.out.println(e);
-		}
-	
-	//	public NeuralNetwork (int iNbrNNInputs, int [] aiNbrNeuronsByLayer, double [] adBiasByLayer,  double dLearningRate)	{
-		NeuralNetwork nn = new NeuralNetwork(iNbrInputs, aiNbrNeurons, adBiases, dLearningRate);
-		System.out.println(nn.getDesription());
-		return nn;
-	}*/
-	
-	
 	//*********************************************************
 	//************ STATIC METHODS FOR TESTING *****************
 	//*********************************************************

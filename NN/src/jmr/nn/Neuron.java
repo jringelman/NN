@@ -13,7 +13,7 @@ public class Neuron {
 	double m_adWeights[];
 	double m_adInputs[];
 	double m_dNet; //THE NET SUM OF INPUTS * WEIGHTS PLUS BIAS
-	double m_dAct; //NEURON ACTIVATION AFTER SIGMOID FUNCTION PERFORMED ON NET VALUE
+	double m_dActivation; //NEURON ACTIVATION AFTER SIGMOID FUNCTION PERFORMED ON NET VALUE
 	
 	private final static Random random = new Random();
 	
@@ -56,14 +56,14 @@ public class Neuron {
 			m_dNet += adInputs[i] * m_adWeights[i];
 		}
 		m_dNet += dBias;
-		m_dAct = 1/(1+Math.exp(-m_dNet));
-       // StdOut.printf("%s Activated  NET=%8.5f  ACT=%8.5f\n", m_sLabel , m_dNet, m_dAct);   
-        return m_dAct;
+		m_dActivation = 1/(1+Math.exp(-m_dNet));
+       // StdOut.printf("%s Activated  NET=%8.5f  ACT=%8.5f\n", m_sLabel , m_dNet, m_dActivation);   
+        return m_dActivation;
 	}
 	
 	//ONLY USED FOR OUTPUT LAYER NEURONS
 	protected double computeError(double dTarget) {
-		double dError = 0.5 * (dTarget - m_dAct)*(dTarget - m_dAct);
+		double dError = 0.5 * (dTarget - m_dActivation)*(dTarget - m_dActivation);
 		//StdOut.printf("%s Error=%8.5f\n", m_sLabel, dError);
 		return dError;
 	}
@@ -85,7 +85,7 @@ public class Neuron {
 	protected double [] computeNewWeights(double dETdACT, double dLearningRate) {
 
 		//COMPUTE NEW WEIGHTS FOR THIS NEURON
-		double dACTdNET = m_dAct*(1-m_dAct);
+		double dACTdNET = m_dActivation*(1-m_dActivation);
 		double dETdNET = dACTdNET * dETdACT;
 		double [] adNETdW =  m_adInputs.clone(); // dNETdW is the INPUTS
 		double [] adETdW = ArrayUtil.times(adNETdW, dETdNET);

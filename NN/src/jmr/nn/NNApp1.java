@@ -10,10 +10,10 @@ import java.text.SimpleDateFormat;
 import jmr.util.Log;
 import jmr.util.StdOut;
 
-/* NNApp1 runs MNIST image data or MARKET data through NeuralNetwork 
- * pass into app MNIST or MARKET
+/* NNApp1 runs MNIST image data or SP500 data through NeuralNetwork 
  * Data for MNIST is stored here:  ./data/mnist/
  * Data for MARKET is stored here: ./data/market/
+ * Neural network configured in NN.properties.
  */
 
 public class NNApp1 {
@@ -24,27 +24,28 @@ public class NNApp1 {
 		//OPEN PROPERTIES FILE
 		System.out.println("Loading Properties File: " +  m_sPROPERTIES_FILE);
 		
-		//GET DATASETS TO RUN
-		String sRunMnist = "1";
-		String sRunSP500 = "0";
-		
 		try	{
+			//GET DATASETS TO RUN
+			String sRunMnist = "1";
+			String sRunSP500 = "0";
+
 			AppProperties.loadProperties(m_sPROPERTIES_FILE);
 			sRunMnist = AppProperties.getProperty("nn.mnist.run");
 			sRunSP500 = AppProperties.getProperty("nn.sp500.run");
+			
 			StdOut.printf("Properties file has nn.mnist.run=%s & nn.sp500.run=%s\n", sRunMnist, sRunSP500);
+			
+			if(sRunMnist.equals("1"))
+				MnistReader.runMinstDataSet();
+
+			if(sRunSP500.equals("1"))
+			{
+				MarketData md = new MarketData();
+				md.runNNusingPrices();
+
+			}
 		}catch (Exception e){
 			System.out.println(e);
-		}
-		
-		if(sRunMnist.equals("1"))
-			MnistReader.runMinstDataSet();
-
-		if(sRunSP500.equals("1"))
-		{
-			MarketData md = new MarketData();
-			md.runNNusingPrices();
-
 		}
 	}
 

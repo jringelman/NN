@@ -8,7 +8,6 @@ package jmr.nn;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-//import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -27,94 +26,108 @@ import java.util.Arrays;
 public class MnistReader {
 	
 	static final String m_sDATA_PATH = "./data/mnist/";
+	
+	static final String sFILE_TRAIN_LABELS = "train-labels-idx1-ubyte.gz";
+	static final String sFILE_TRAIN_IMAGES = "train-images-idx3-ubyte.gz";
+	static final String sFILE_TEST_LABELS = "t10k-labels-idx1-ubyte.gz";
+	static final String sFILE_TEST_IMAGES = "t10k-images-idx3-ubyte.gz";
+
 
 	public static void runMinstDataSet()
 	{
-		System.out.println("BEGINNING NEURAL NETWORK ON MNIST DATA");
+		System.out.println("\nBEGINNING NEURAL NETWORK ON MNIST DATA");
 
-		double dBias = 0.1; 
-		final double dLEARNING_RATE = 0.1;
-		final int iNBR_INPUTS = 784; //28 x 28 pixels = 784 pixels
-		final int iNBR_NEURONS_LAYER0 = 200; // THIS IN THE ONLY HIDDEN LAYER
-		final int iNBR_NEURONS_LAYER1 = 10; // THIS IS OUPUT LAYER WITH EACH NODE FOR DIGITS 0 THRU 9;
-		final int iNBR_EPOCHS = 5;
+		NeuralNetwork nn =  NeuralNetwork.loadNNFromPropertiesFile("mnist");
+		System.out.println("NN Created: " + nn.getDescription());
+
+    	try{  		
+    //LOAD TRAINING IMAGES AND LABELS FROM MNIST DATA FILES	
+    	String sFileTrainLabels = m_sDATA_PATH + sFILE_TRAIN_LABELS;
+        String sFileTrainImages = m_sDATA_PATH + sFILE_TRAIN_IMAGES;
+ 
+        StdOut.printf("Loading Training Labels: " + sFileTrainLabels + "\n");
+        int[] aiTrainLabels = MnistReader.getLabels(Paths.get(sFileTrainLabels));
+        StdOut.printf("Loading Training Images: " + sFileTrainImages + "\n");
+        List<int[][]> listTrainImages = MnistReader.getImages(Paths.get(sFileTrainImages));
+    
+        StdOut.printf("Loaded Mnist Training Data: %d Images and %d Labels\n", listTrainImages.size(), aiTrainLabels.length);
 		
-		NNLayer [] aLayer = new NNLayer[2];
-		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
-	    aLayer[0] = new NNLayer(0, iNBR_INPUTS, iNBR_NEURONS_LAYER0, dBias);
-	    aLayer[1] = new NNLayer(1, iNBR_NEURONS_LAYER0, iNBR_NEURONS_LAYER1, dBias);
-	    NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
+    //GET NBR EPOCHS FROM PROPERTIES FILE
+		int iNbrEpochs = Integer.parseInt(AppProperties.getProperty("nn.mnist.epochs"));
+		System.out.println("\nBeginning " + iNbrEpochs + " epochs of training");
+		
+	//TRAIN THE NETWORK EP0CHS TIMES
+		int iErrorsEpoch = 0;
 
-    	String sFileTrainLabels = m_sDATA_PATH + "train-labels-idx1-ubyte.gz";
-    	String sFileTrainImages = m_sDATA_PATH + "train-images-idx3-ubyte.gz";
-
-    	try{
-    		 
-    	int[] aiTrainLabels = MnistReader.getLabels(Paths.get(sFileTrainLabels));
-    	List<int[][]> listTrainImages = MnistReader.getImages(Paths.get(sFileTrainImages));
-    	
-		System.out.println(aiTrainLabels.length + " Train Labels");
-		System.out.println(listTrainImages.size() + " Train Images");
-		System.out.println("Beginning " + iNBR_EPOCHS + " epochs of training");
-
-		double dErrorForEpoch = 0.0;
-		for (int iEpoch=0; iEpoch<iNBR_EPOCHS; iEpoch++)
+		for (int iEpoch=0; iEpoch<iNbrEpochs; iEpoch++)
 		{
-			//System.out.println("\nEpoch: " + iEpoch);
+			iErrorsEpoch =0;
 			for (int i=0; i<aiTrainLabels.length; i++) {
-			
+				//iCorrectSet = 0;
+				//CREATE TARGET ARRAY FOR THIS EPOCH; CONVERTS DIGITS TO 10 DIGIT ARRAY OF DOUBLES 
 				double[] adTarget = MnistReader.createTarget(aiTrainLabels[i]);
 			
+				//GET 2 DIMENSION IMAGE, FLATTEN TO 1 DIMENSION, THEN SCALE VALUES TO 0.0 to 1.0 RANGE
 				int[][] aaiImage = listTrainImages.get(i);
-			//	String sImage = MnistReader.renderImage(aaiImage);
-			//	System.out.println(sImage);
-
 				int [] aiImageFlat = MnistReader.flat(aaiImage);
 				double[] adInput = MnistReader.scaleImagePixels(aiImageFlat);
-			
-				double dErrorThisTrain = nn.trainNetwork(adInput, adTarget);
-				dErrorForEpoch += dErrorThisTrain;
-				if(((i+1) % 10000) == 0)
-				{
-					StdOut.printf("%d Images trained for Epoch %d  TotalError=%7.4f\n",(i+1),iEpoch, dErrorThisTrain);
+//				System.out.println(MnistReader.renderImage(aaiImage));
+		
+				//TRAIN NN WITH INPUTS AND TARGETS
+				double [] adOutput = nn.trainNetwork(adInput, adTarget);
+				
+				int iNNGuess = ArrayUtil.maxValueIndex(adOutput);
+				if(iNNGuess !=  aiTrainLabels[i]) {
+					iErrorsEpoch++;
+				}
+				
+				if(((i+1) % 10000) == 0)				{
+					StdOut.printf("%d Images trained for Epoch %d;  Error Rate=%5.1f%%\n",(i+1),iEpoch, (100.0 * iErrorsEpoch)/(double) i);
 				}
 			}
-			StdOut.printf("Epoch %d completed with average Error= %7.4f\n\n", iEpoch, dErrorForEpoch/(double)aiTrainLabels.length);
+			StdOut.printf("Epoch %d completed with Error Rate= %5.1f%%\n\n", iEpoch, (100.0 * iErrorsEpoch)/(double)aiTrainLabels.length);
 		} 
 	  	}catch(Exception e){System.out.println(e);}   
 
-    	//RUN THE MINST TEST DATA
-    	String sFileTestLabels = m_sDATA_PATH + "t10k-labels-idx1-ubyte.gz";
-    	String sFileTestImages = m_sDATA_PATH + "t10k-images-idx3-ubyte.gz";
+    //RUN THE MINST TEST DATA
 
     	try{
-    	
-    	int[] aiTestLabels = MnistReader.getLabels(Paths.get(sFileTestLabels));
+         StdOut.printf("Beginning Testing Phase\n");
+
+    //LOAD TESTING IMAGES AND LABELS FROM MNIST DATA FILES	
+       	String sFileTestLabels = m_sDATA_PATH + sFILE_TEST_LABELS;
+       	String sFileTestImages = m_sDATA_PATH + sFILE_TEST_IMAGES;
+
+        StdOut.printf("Loading Testing Labels: " + sFileTestLabels + "\n");
+        int[] aiTestLabels = MnistReader.getLabels(Paths.get(sFileTestLabels));
+        StdOut.printf("Loading Testing Images: " + sFileTestImages + "\n");
     	List<int[][]> listTestImages = MnistReader.getImages(Paths.get(sFileTestImages));
-    	
-		System.out.println(aiTestLabels.length + " Test Labels");
-		System.out.println(listTestImages.size() + " Test Images");
-    	
-		int iCorrect =0;
+        StdOut.printf("Loaded Mnist Test Data: %d Images and %d Labels\n", listTestImages.size(), aiTestLabels.length);
+
+		int iTestErrors =0;
 		
-		for (int i=0; i<aiTestLabels.length; i++) {			
+		for (int i=0; i<aiTestLabels.length; i++) {	
+			//GET 2 DIMENSION IMAGE, FLATTEN TO 1 DIMENSION, THEN SCALE VALUES TO 0.0 to 1.0 RANGE
 			int[][] aaiImage = listTestImages.get(i);
 			int [] aiImageFlat = MnistReader.flat(aaiImage);
 			double[] adInput = MnistReader.scaleImagePixels(aiImageFlat);
 
+			//QUERY THE NN WITH THE INPUT IMAGE DATA
 			double [] adOutput = nn.query(adInput);
+			
+			//SEE IF THE NN GUESS OF OUTPUT IS CORRECT
 			int iNNGuess = ArrayUtil.maxValueIndex(adOutput);
-			if(iNNGuess ==  aiTestLabels[i])
-				iCorrect++;
+			if(iNNGuess !=  aiTestLabels[i])
+				iTestErrors++;
+		
+		//	System.out.println(MnistReader.renderImage(aaiImage));
 		//	StdOut.printf("Test Label Target: %d  NN Guess: %d\n", aiTestLabels[i], iNNGuess);
 		//	ArrayUtil.show(adOutput, "NN Output", "%8.5f");
-		//	String sImage = MnistReader.renderImage(aaiImage);
-		//	System.out.println(sImage);
 		} 
-		StdOut.printf("Total Images Tested: %d Correct: %d  Wrong: %d Accuracy %5.1f%%\n",aiTestLabels.length, iCorrect, aiTestLabels.length - iCorrect, (double)iCorrect/(double) aiTestLabels.length * 100.0);
+		StdOut.printf("Tested %d Images with Error Rate of %5.1f%%\n",aiTestLabels.length, (double)iTestErrors/(double) aiTestLabels.length * 100.0);
 
     	}catch(Exception e){System.out.println(e);}   
-		System.out.println("COMPLETED NEURAL NETWORK ON MNIST DATA\n");
+		System.out.println("\nCOMPLETED NEURAL NETWORK ON MNIST DATA\n");
 	}
 	
 	

@@ -16,11 +16,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src/NN.properties</name>
-			<type>1</type>
-			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/NN.properties</location>
-		</link>
-		<link>
 			<name>data/market/sp500 1927-12 to 2020-11-23.csv</name>
 			<type>1</type>
 			<location>/Users/JMR/Dropbox/projects/eclipse-workspace/git/repo/NN/data/market/sp500 1927-12 to 2020-11-23.csv</location>

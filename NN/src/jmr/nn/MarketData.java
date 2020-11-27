@@ -7,19 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 
-import jmr.nn.MarketData.Price;
-import jmr.util.ArrayUtil;
+import jmr.util.AppProperties;
+//import jmr.nn.MarketData.Price;
+//import jmr.util.ArrayUtil;
 import jmr.util.StdOut;
 
 
 public class MarketData {
 	
-//	static final String m_sDATA_FILE = "/Users/JMR/Dropbox/projects/data/sp500 1927-12 to 2020-11-23.csv";
 	static final String m_sDATA_FILE = "./data/market/sp500 1927-12 to 2020-11-23.csv";
 	static final int m_nDATA_SET_SIZE = 100;
 	static final double m_dTRAIN_DATA_PCT = 0.99;
 	static final int m_nPREDICT_DAYS_IN_FUTURE = 1;
-	final int m_nNBR_EPOCHS = 1;
 	
 	public class Price{
 		public String m_sDate;
@@ -34,7 +33,7 @@ public class MarketData {
 
 	}
 
-	//prepareData
+	//runNNusingPrices
 	// First, the list of Prices (date, price) is loaded
 	// THE LIST OF PRICE DATA WILL BE COPIED NUMEROUS TIME TO CREATE nTotalDataSets DATA SETS
 	// Each data set will be m_nDATA_SET_SIZE in size
@@ -48,10 +47,10 @@ public class MarketData {
 
 	public void runNNusingPrices()
 	{
-		System.out.println("BEGINNING NEURAL NETWORK ON MARKET DATA");
+		System.out.println("BEGINNING NEURAL NETWORK ON SP500 DATA");
 		//LOAD PRICES INTO AN ARRAY
 		double [] aPrice = loadPriceArray();
-		System.out.println("aPrice.length= " + aPrice.length);
+		System.out.println("Loaded " + aPrice.length + " SP500 historical prices");
 		
 		//SCALE THE PRICES TO FIT BETWEEN 0 AND 1
 //		double [] aScaledPrice = scaleDataSet(aPrice);
@@ -61,7 +60,7 @@ public class MarketData {
 		int nTotalDataSets = aPrice.length - m_nDATA_SET_SIZE;
 		int nTrainDataSets = (int)  (nTotalDataSets * m_dTRAIN_DATA_PCT);
 		int nTestDataSets = nTotalDataSets - nTrainDataSets;
-		StdOut.printf("nTotalDataSets= %d  nTrainDataSets= %d nTestDataSets= %d\n", nTotalDataSets, nTrainDataSets, nTestDataSets);
+		StdOut.printf("Computed DataSets: TotalDataSets= %d  TrainDataSets= %d TestDataSets= %d\n", nTotalDataSets, nTrainDataSets, nTestDataSets);
 		
 		//CREATE TRAIN DATA SETS AND ASSOCIATED TARGETS
 		int nCntTrain = 0;
@@ -107,26 +106,36 @@ public class MarketData {
 			
 			nCntTest++;
 		}
-
-		System.out.println("CntTrain=" + nCntTrain + "  CntTest=" + nCntTest);
+		StdOut.printf("Created Data Sets: TrainDataSets= %d TestDataSets= %d\n", nCntTrain, nCntTest);
 	
-	    NeuralNetwork nn = this.createNN();
+		NeuralNetwork nn =  NeuralNetwork.loadNNFromPropertiesFile("sp500");
+		System.out.println("NN Created: " + nn.getDescription());
+	   // NeuralNetwork nn = this.createNN();
 	    
+	   //GET NBR EPOCHS FROM PROPERTIES FILE
+		int iNbrEpochs=1;
+		try {
+			iNbrEpochs = Integer.parseInt(AppProperties.getProperty("nn.sp500.epochs"));
+			System.out.println("\nBeginning " + iNbrEpochs + " epochs of training");
+		}catch(Exception e)	{
+			System.out.println(e);
+		};
+
 	    //TRAIN NETWORK
-		double dErrorForEpoch = 0.0;
-		for (int iEpoch=0; iEpoch<m_nNBR_EPOCHS; iEpoch++)
+		for (int iEpoch=0; iEpoch<iNbrEpochs; iEpoch++)
 		{
 			for (int i=0; i<aadTrainDataSets.length; i++) {
-				double dErrorThisTrain = nn.trainNetwork(aadTrainDataSets[i], aadTrainTargets[i]);
-				dErrorForEpoch += dErrorThisTrain;
-				if(((i+1) % 1000) == 0) {
-					StdOut.printf("%d data sets trained for Epoch %d  TotalError=%9.6f\n",(i+1),iEpoch, dErrorThisTrain);
+				double [] adOutput = nn.trainNetwork(aadTrainDataSets[i], aadTrainTargets[i]);
+				if(((i+1) % 5000) == 0) {
+					StdOut.printf("%d data sets trained for Epoch %d\n",(i+1),iEpoch);
 				}
 			}
-			StdOut.printf("Training Epoch %d completed with average Error= %9.6f\n\n", iEpoch, dErrorForEpoch/(double)aadTrainDataSets.length);
+			StdOut.printf("Training Epoch %d completed\n\n", iEpoch);
 		} 
-		
+     
+	
 		//TEST NETWORK
+		StdOut.printf("Beginning Testing Phase\n");
 		for (int i=0; i<aadTestDataSets.length; i++) {			
 			double [] adOutputScaled = nn.query(aadTestDataSetsScaled[i]);
 			//double dNNGuess = Math.pow(10.0, adOutputScaled[0]*10);
@@ -138,7 +147,7 @@ public class MarketData {
 		} 
 		System.out.println("COMPLETED NEURAL NETWORK ON MARKET DATA\n");
 	}
-	
+/*	
 	protected NeuralNetwork createNN()
 	{
 		//BUILD NN
@@ -157,7 +166,7 @@ public class MarketData {
 	    aLayer[2] = new NNLayer(2, iNBR_NEURONS_LAYER1, iNBR_NEURONS_LAYER2, dBias);
 	    NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
 	    return nn;
-	}
+	}*/
 
 	protected double [] pctChgDataSet(double [] adDataSet)
 	{

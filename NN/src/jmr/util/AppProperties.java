@@ -50,7 +50,7 @@ public class AppProperties {
             sValue = sValue.substring(0,iIdxStart)+ sNestedProp +  sValue.substring(iIdxStop+1);
          }
       }
-      return sValue;
+      return sValue.trim();
     }
     
     private AppProperties() {

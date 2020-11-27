@@ -6,6 +6,7 @@ import jmr.util.AppProperties;
 import jmr.util.ArrayUtil;
 import jmr.util.StdOut;
 
+
 /* NeuralNetwork is composed of 1 or more NNLayers which are composed of Neurons.
  * There is no input layer. Inputs are simply passed to the first layer
  * The last layer is the output layer. Prior layers are hidden layers.
@@ -17,7 +18,7 @@ public class NeuralNetwork {
 	
 	NNLayer [] m_aLayer;
 	double m_dLearningRate;
-	int m_iNbrNNInputs;
+	int m_iNbrInputs;
 	
 	//THERE ARE 2 WAYS TO CREATE NeuralNetwork
 	
@@ -25,6 +26,7 @@ public class NeuralNetwork {
 	public NeuralNetwork(NNLayer [] aLayers, double dLearningRate){
 		m_aLayer =  aLayers;
 		m_dLearningRate = dLearningRate;
+		m_iNbrInputs = aLayers[0].getNumberInputs();
 	}
 	
 	//METHOD 2 IS TO PASS IN AN ARRAY WITH THE NBR OF LAYERS/NEURONS AND AN ARRAY W/ THE BIASES AND LET NeuralNetwork CREATE THE LAYERS
@@ -36,6 +38,7 @@ public class NeuralNetwork {
 	public NeuralNetwork (int iNbrNNInputs, int [] aiNbrNeuronsByLayer, double [] adBiasByLayer,  double dLearningRate)	{
 		if (aiNbrNeuronsByLayer.length != adBiasByLayer.length) throw new RuntimeException("Mismatch params in NeuralNetwork constructor");
 
+		m_iNbrInputs = iNbrNNInputs;
 		this.m_aLayer = new NNLayer[aiNbrNeuronsByLayer.length];
 		m_dLearningRate = dLearningRate;
 		
@@ -63,7 +66,7 @@ public class NeuralNetwork {
 		return adACT; //RETURNS FINAL OUTPUT
 	}
 
-	public double trainNetwork(double [] adInput, double [] adTarget){
+	public double [] trainNetwork(double [] adInput, double [] adTarget){
 		double [] adACT = adInput;
 		//double [][] aadACT = new double [m_aLayer.length][];
 		
@@ -76,7 +79,7 @@ public class NeuralNetwork {
 		}
 		
 		//CALC TOTAL ERROR FOR OUTPUT LAYER
-		double dErrorTotal = m_aLayer[m_aLayer.length-1].computeError(adTarget);
+	//	double dErrorTotal = m_aLayer[m_aLayer.length-1].computeError(adTarget);
 
 		//BACKPROPOGATE OUTPUT LAYER
 		//  WITH dET/dACT AS INPUT, EACH LAYER CAN COMPUTE NEW WEIGHTS
@@ -87,15 +90,111 @@ public class NeuralNetwork {
 		for (int iLayer=m_aLayer.length-1;iLayer >=0; iLayer--) {
 			adETdACT = m_aLayer[iLayer].computeNewWeights(adETdACT, m_dLearningRate);
 		}
-		return dErrorTotal;
+		return adACT;
 	}
 
 	
+	public String getDescription(){
+		String sDesc = "Inputs=" + this.m_iNbrInputs;
+		sDesc += " Layers=" + this.m_aLayer.length;
+		sDesc += " Neurons={";
+		for(int i=0; i<m_aLayer.length; i++) {
+			sDesc += m_aLayer[i].getNbrNeurons();
+			if(i < m_aLayer.length-1)
+				sDesc += ",";
+		}
+		sDesc += "} Biases={";
+		for(int i=0; i<m_aLayer.length; i++) {
+			sDesc += m_aLayer[i].getBias();
+			if(i < m_aLayer.length-1)
+				sDesc += ",";
+		}
+		sDesc += "} LearningRate=" + this.m_dLearningRate;
+		return sDesc;				
+	}
+
+
+	// INPUTS FOR PROPERTIES FILE FOR 3 LAYER NN
+	//		nn.mnist.inputs=784
+	//		nn.mnist.neurons=10,20,30
+	//		nn.mnist.bias=0.1,0.2,0.3
+	//		nn.mnist.learningrate=0.5
+	//		nn.mnist.epochs=7
+	public static NeuralNetwork loadNNFromPropertiesFile(String sKey)
+	{
+		int iNbrLayers = 2;
+		int iNbrInputs = 10;
+		double dLearningRate = 0.1;
+		int [] aiNbrNeurons = new int[iNbrLayers];
+		double [] adBiases = new  double[iNbrLayers];
+			
+		String sKeyPrefix = "nn." + sKey + ".";
+		try {
+			iNbrInputs = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "inputs"));
+			
+			String sNeurons = AppProperties.getProperty(sKeyPrefix + "neurons");
+            String[] asNeuronByLayer = sNeurons.split(",");
+            
+			String sBiases = AppProperties.getProperty(sKeyPrefix + "bias");
+            String[] sBiasByLayer = sBiases.split(",");
+		
+			iNbrLayers = asNeuronByLayer.length;
+			
+			aiNbrNeurons = new int[iNbrLayers];
+			adBiases = new double[iNbrLayers];
+			for(int i=0; i<iNbrLayers; i++)
+			{
+				aiNbrNeurons[i] = Integer.parseInt(asNeuronByLayer[i]);
+				adBiases[i] = Double.parseDouble(sBiasByLayer[i]);
+			}
+			dLearningRate = Double.parseDouble(AppProperties.getProperty(sKeyPrefix + "learningrate"));
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+	
+	//	public NeuralNetwork (int iNbrNNInputs, int [] aiNbrNeuronsByLayer, double [] adBiasByLayer,  double dLearningRate)	{
+		NeuralNetwork nn = new NeuralNetwork(iNbrInputs, aiNbrNeurons, adBiases, dLearningRate);
+		return nn;
+	}
+
+	/*public static NeuralNetwork loadNNFromPropertiesFile2(String sID)
+	{
+		int iNbrLayers = 2;
+		int iNbrInputs = 10;
+		double dLearningRate = 0.1;
+		int iNbrEpochs = 1;
+		int [] aiNbrNeurons = new int[iNbrLayers];
+		double [] adBiases = new  double[iNbrLayers];
+			
+		String sKeyPrefix = "nn." + sID + ".";
+		try {
+			iNbrInputs = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "inputs"));
+			iNbrLayers = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "layers"));
+			aiNbrNeurons = new int[iNbrLayers];
+			adBiases = new double[iNbrLayers];
+			for(int i=0; i<iNbrLayers; i++)
+			{
+				aiNbrNeurons[i] = Integer.parseInt(AppProperties.getProperty(sKeyPrefix+ "layer." + i + "." + "neurons"));
+				adBiases[i] = Double.parseDouble(AppProperties.getProperty(sKeyPrefix+ "layer." + i + "." + "bias"));
+			}
+			dLearningRate = Double.parseDouble(AppProperties.getProperty(sKeyPrefix + "learningrate"));
+			iNbrEpochs = Integer.parseInt(AppProperties.getProperty(sKeyPrefix + "epochs"));
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+	
+	//	public NeuralNetwork (int iNbrNNInputs, int [] aiNbrNeuronsByLayer, double [] adBiasByLayer,  double dLearningRate)	{
+		NeuralNetwork nn = new NeuralNetwork(iNbrInputs, aiNbrNeurons, adBiases, dLearningRate);
+		System.out.println(nn.getDesription());
+		return nn;
+	}*/
 	
 	
-//*********************************************************
-//************ STATIC METHODS FOR TESTING *****************
-//*********************************************************
+	//*********************************************************
+	//************ STATIC METHODS FOR TESTING *****************
+	//*********************************************************
 
 	public static void test1()
 	{	//BUILDING THIS NEURAL NETWORK TO VERIFY SAME RESULTS:
@@ -126,8 +225,8 @@ public class NeuralNetwork {
 //		double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
 		//ArrayUtil.show(aadReturn, "aadReturn", "%9.5f");
   
-		double dTotalError = nn.trainNetwork(adInput, adTarget);
-		StdOut.printf("Total Error=%d\n", dTotalError);
+		//double dTotalError = nn.trainNetwork(adInput, adTarget);
+		//StdOut.printf("Total Error=%d\n", dTotalError);
 	}
 
 	
@@ -158,8 +257,8 @@ public class NeuralNetwork {
       	double[] adInput = {0.05,0.1};  
       	double[] adTarget = {0.01,0.99};  
 
-		double dTotalError = nn.trainNetwork(adInput, adTarget);
-		StdOut.printf("Total Error=%d\n", dTotalError);
+	//	double dTotalError = nn.trainNetwork(adInput, adTarget);
+		//StdOut.printf("Total Error=%d\n", dTotalError);
 
 	//	double [][] aadReturn = nn.trainNetwork(adInput, adTarget);
 	}

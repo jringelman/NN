@@ -3,6 +3,9 @@ package jmr.nn;
 
 import java.io.File;
 import java.util.Date;
+
+import jmr.util.AppProperties;
+
 import java.text.SimpleDateFormat;
 import jmr.util.Log;
 
@@ -13,29 +16,34 @@ import jmr.util.Log;
  */
 
 public class NNApp1 {
+	static final String m_sPROPERTIES_FILE = "./NN.properties";
 	
 	public static void main(String[] args) {
 		
-		if(args.length > 0) {
-
-			System.out.println("args[0]= " + args[0]);
-
-			String sDataToRun = args[0];
+		//OPEN PROPERTIES FILE
+		System.out.println("Loading Properties File: " +  m_sPROPERTIES_FILE);
+		
+		//GET DATASET TO RUN
+		String sDataset = "";
+		try	{
+			AppProperties.loadProperties(m_sPROPERTIES_FILE);
+			sDataset = AppProperties.getProperty("dataset");
 			
-			switch (sDataToRun) {
-			case "MNIST":
+		}catch (Exception e){
+			System.out.println(e);
+		}
+					
+		switch (sDataset) {
+			case "mnist":
 				MnistReader.runMinstDataSet();
 				break;
-			case "MARKET":
+			case "sp500":
 				MarketData md = new MarketData();
 				md.runNNusingPrices();
 				break;
 			default:
 				MnistReader.runMinstDataSet();
-			}
 		}
-		else
-			MnistReader.runMinstDataSet();
 	}
 
 	

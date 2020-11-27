@@ -36,6 +36,14 @@ public class NNLayer {
 		return m_aNeurons.length;
 	}
 	
+	public double getBias() {
+		return m_dBias;
+	}
+	
+	public int getNumberInputs() {
+		return m_nNbrInputs;
+	}
+	
 	protected void setWeights(double [][] aadWeights)
 	{
 		for(int i=0; i<m_aNeurons.length; i++)

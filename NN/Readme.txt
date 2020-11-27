@@ -34,6 +34,7 @@ TO COMPILE APPLICATION
 TO RUN APPLICATION
 - modify NN.properties file and save changes.
 - open terminal and navigate to : NN-master/NN/
+- run java application:
 	java -cp ./bin/ jmr.nn.NNApp1 
      
      

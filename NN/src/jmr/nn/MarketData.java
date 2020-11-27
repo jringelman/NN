@@ -16,8 +16,8 @@ import jmr.util.StdOut;
 public class MarketData {
 	
 	static final String m_sDATA_FILE = "./data/market/sp500 1927-12 to 2020-11-23.csv";
-	static final int m_nDATA_SET_SIZE = 100;
-	static final double m_dTRAIN_DATA_PCT = 0.99;
+	//static final int m_nDATA_SET_SIZE = 100;
+	static final double m_dTRAIN_DATA_PCT = 0.995;
 	static final int m_nPREDICT_DAYS_IN_FUTURE = 1;
 	
 	public class Price{
@@ -33,7 +33,7 @@ public class MarketData {
 
 	}
 
-	//runNNusingPrices
+//runNNusingPrices
 	// First, the list of Prices (date, price) is loaded
 	// THE LIST OF PRICE DATA WILL BE COPIED NUMEROUS TIME TO CREATE nTotalDataSets DATA SETS
 	// Each data set will be m_nDATA_SET_SIZE in size
@@ -48,6 +48,13 @@ public class MarketData {
 	public void runNNusingPrices()
 	{
 		System.out.println("BEGINNING NEURAL NETWORK ON SP500 DATA");
+		
+		//CREATE NN FROM PROPS FILE; NEED TO DO NOW BECAUSE WE NEED SOME PARAMS TO CREATE DATA SETS
+		NeuralNetwork nn =  NeuralNetwork.loadNNFromPropertiesFile("sp500");
+		System.out.println("NN Created: " + nn.getDescription());
+		
+		int iNbrInputs = nn.getNbrInputs();
+		
 		//LOAD PRICES INTO AN ARRAY
 		double [] aPrice = loadPriceArray();
 		System.out.println("Loaded " + aPrice.length + " SP500 historical prices");
@@ -57,20 +64,20 @@ public class MarketData {
 		double [] aScaledPrice = pctChgDataSet(aPrice);
 		
 	  //COMPUTE SIZES OF TRAIN AND TEST DATA SETS
-		int nTotalDataSets = aPrice.length - m_nDATA_SET_SIZE;
+		int nTotalDataSets = aPrice.length - iNbrInputs;
 		int nTrainDataSets = (int)  (nTotalDataSets * m_dTRAIN_DATA_PCT);
 		int nTestDataSets = nTotalDataSets - nTrainDataSets;
 		StdOut.printf("Computed DataSets: TotalDataSets= %d  TrainDataSets= %d TestDataSets= %d\n", nTotalDataSets, nTrainDataSets, nTestDataSets);
 		
 		//CREATE TRAIN DATA SETS AND ASSOCIATED TARGETS
 		int nCntTrain = 0;
-		double [][] aadTrainDataSets = new double [nTrainDataSets][m_nDATA_SET_SIZE];
+		double [][] aadTrainDataSets = new double [nTrainDataSets][iNbrInputs];
 		double [][] aadTrainTargets = new double  [nTrainDataSets][1];
 
 		for (int j=0; j<nTrainDataSets; j++)		{
-			aadTrainDataSets[j] = Arrays.copyOfRange(aScaledPrice, j, (j + m_nDATA_SET_SIZE));
+			aadTrainDataSets[j] = Arrays.copyOfRange(aScaledPrice, j, (j + iNbrInputs));
 			
-			int nTargetFutureIndex = j + m_nDATA_SET_SIZE + m_nPREDICT_DAYS_IN_FUTURE -1;
+			int nTargetFutureIndex = j + iNbrInputs + m_nPREDICT_DAYS_IN_FUTURE -1;
 			//aadTrainTargets[j][0] = aScaledPrice[nTargetFutureIndex];
 			if (aScaledPrice[nTargetFutureIndex] == 0.0)
 				aadTrainTargets[j][0] = 0.5;
@@ -83,18 +90,18 @@ public class MarketData {
 	
 		//CREATE TEST DATA SETS AND ASSOCIATED TARGETS
 		int nCntTest = 0;
-		double [][] aadTestDataSets = new double [nTestDataSets][m_nDATA_SET_SIZE];
-		double [][] aadTestDataSetsScaled = new double [nTestDataSets][m_nDATA_SET_SIZE];
+		double [][] aadTestDataSets = new double [nTestDataSets][iNbrInputs];
+		double [][] aadTestDataSetsScaled = new double [nTestDataSets][iNbrInputs];
 		double [][] aadTestTargets = new double  [nTestDataSets][1];
 		double [][] aadTestTargetsScaled = new double  [nTestDataSets][1];
 
 		//****** WARNING: NEED TO FIX THIS IF m_nPREDICT_DAYS_IN_FUTURE > 1 *********
 		for (int j=0; j<(nTestDataSets); j++)		{
 			
-			aadTestDataSetsScaled[j] = Arrays.copyOfRange(aScaledPrice, (j+nTrainDataSets), (j + nTrainDataSets + m_nDATA_SET_SIZE));
-			aadTestDataSets[j] = Arrays.copyOfRange(aPrice, (j+nTrainDataSets), (j + nTrainDataSets + m_nDATA_SET_SIZE));
+			aadTestDataSetsScaled[j] = Arrays.copyOfRange(aScaledPrice, (j+nTrainDataSets), (j + nTrainDataSets + iNbrInputs));
+			aadTestDataSets[j] = Arrays.copyOfRange(aPrice, (j+nTrainDataSets), (j + nTrainDataSets + iNbrInputs));
 
-			int nTargetFutureIndex = j + nTrainDataSets + m_nDATA_SET_SIZE + m_nPREDICT_DAYS_IN_FUTURE -1;
+			int nTargetFutureIndex = j + nTrainDataSets + iNbrInputs + m_nPREDICT_DAYS_IN_FUTURE -1;
 			//aadTestTargetsScaled[j][0] = aScaledPrice[nTargetFutureIndex];
 			aadTestTargets[j][0] = aPrice[nTargetFutureIndex];
 			if (aScaledPrice[nTargetFutureIndex] == 0.0)
@@ -108,9 +115,6 @@ public class MarketData {
 		}
 		StdOut.printf("Created Data Sets: TrainDataSets= %d TestDataSets= %d\n", nCntTrain, nCntTest);
 	
-		NeuralNetwork nn =  NeuralNetwork.loadNNFromPropertiesFile("sp500");
-		System.out.println("NN Created: " + nn.getDescription());
-	   // NeuralNetwork nn = this.createNN();
 	    
 	   //GET NBR EPOCHS FROM PROPERTIES FILE
 		int iNbrEpochs=1;
@@ -127,10 +131,10 @@ public class MarketData {
 			for (int i=0; i<aadTrainDataSets.length; i++) {
 				double [] adOutput = nn.trainNetwork(aadTrainDataSets[i], aadTrainTargets[i]);
 				if(((i+1) % 5000) == 0) {
-					StdOut.printf("%d data sets trained for Epoch %d\n",(i+1),iEpoch);
+					StdOut.printf("%d data sets trained for Epoch %d\n",(i+1),iEpoch+1);
 				}
 			}
-			StdOut.printf("Training Epoch %d completed\n\n", iEpoch);
+			StdOut.printf("Training Epoch %d completed\n\n", iEpoch + 1);
 		} 
      
 	

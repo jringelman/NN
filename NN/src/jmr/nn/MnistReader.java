@@ -31,14 +31,29 @@ public class MnistReader {
 	static final String sFILE_TRAIN_IMAGES = "train-images-idx3-ubyte.gz";
 	static final String sFILE_TEST_LABELS = "t10k-labels-idx1-ubyte.gz";
 	static final String sFILE_TEST_IMAGES = "t10k-images-idx3-ubyte.gz";
+	static final int iREQUIRED_INPUTS = 784;
+	static final int iREQUIRED_OUTPUTS_NEURONS = 10;
 
 
 	public static void runMinstDataSet()
 	{
 		System.out.println("\nBEGINNING NEURAL NETWORK ON MNIST DATA");
 
+		//CREATE NN FROM PROPS FILE
 		NeuralNetwork nn =  NeuralNetwork.loadNNFromPropertiesFile("mnist");
 		System.out.println("NN Created: " + nn.getDescription());
+
+		//VERIFY THE NUMBER OF INPUTS AND THE NBR OF OUTPUT NEURONS
+		if(nn.getNbrInputs() != iREQUIRED_INPUTS){
+			StdOut.printf("ERROR! MNIST requires %d inputs; Properties file has %d inputs. Exiting NN run",iREQUIRED_INPUTS,nn.getNbrInputs());
+			return;
+		}
+		int iNbrNeuronsOutputLayer = nn.getNbrNeuronsInLayer(nn.getNbrLayers()-1);
+		if(iNbrNeuronsOutputLayer != iREQUIRED_OUTPUTS_NEURONS){
+			StdOut.printf("ERROR! MNIST requires %d output neurons; Properties file has %d neurons in output layer. Exiting NN run",iREQUIRED_OUTPUTS_NEURONS,iNbrNeuronsOutputLayer);
+			return;
+		}
+	
 
     	try{  		
     //LOAD TRAINING IMAGES AND LABELS FROM MNIST DATA FILES	
@@ -82,10 +97,10 @@ public class MnistReader {
 				}
 				
 				if(((i+1) % 10000) == 0)				{
-					StdOut.printf("%d Images trained for Epoch %d;  Error Rate=%5.1f%%\n",(i+1),iEpoch, (100.0 * iErrorsEpoch)/(double) i);
+					StdOut.printf("%d Images trained for Epoch %d;  Error Rate=%5.1f%%\n",(i+1),iEpoch+1, (100.0 * iErrorsEpoch)/(double) i);
 				}
 			}
-			StdOut.printf("Epoch %d completed with Error Rate= %5.1f%%\n\n", iEpoch, (100.0 * iErrorsEpoch)/(double)aiTrainLabels.length);
+			StdOut.printf("Epoch %d completed with Error Rate= %5.1f%%\n\n", iEpoch+1, (100.0 * iErrorsEpoch)/(double)aiTrainLabels.length);
 		} 
 	  	}catch(Exception e){System.out.println(e);}   
 

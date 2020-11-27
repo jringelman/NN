@@ -117,6 +117,14 @@ public class NeuralNetwork {
 	public void setWeights(int iLayer, double [][] aadWeights) {
 		m_aLayer[iLayer].setWeights(aadWeights);
 	}
+	public int getNbrLayers()	{
+		return this.m_aLayer.length;
+	}
+	public int getNbrNeuronsInLayer(int iLayer)	{
+		
+		if (iLayer >=  m_aLayer.length) throw new RuntimeException("Mismatch params in NeuralNetwork.getNbrNeuronsInLayer");
+		return m_aLayer[iLayer].getNbrNeurons();
+	}
 	
 	public double [] query(double [] adInput) {
 		double [] adACT = adInput;
@@ -156,6 +164,9 @@ public class NeuralNetwork {
 		return adACT;
 	}
 
+	public int getNbrInputs() {
+		return m_iNbrInputs;
+	}
 	
 
 		

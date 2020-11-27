@@ -14,6 +14,15 @@ The 4 data files for MNIST are stored here:  ./data/mnist/
 MARKET DATA
 Historical data for SP500 for MARKET is stored here: ./data/market/
 	- sp500 1927-12 to 2020-11-23.csv
+	
+PROPERTIES FILE
+Configure Neural Network for each data set in properties file.
+For example:
+	nn.mnist.inputs=784 
+	nn.mnist.neurons=20,10
+	nn.mnist.bias=0.1,0.1
+	nn.mnist.learningrate=0.2
+	nn.mnist.epochs=2
 
 TO COMPILE APPLICATION
 - download and unzip project
@@ -22,11 +31,9 @@ TO COMPILE APPLICATION
       javac -d ./bin/ -cp ./bin/ ./src/jmr/util/*.java ./src/jmr/nn/*.java 
 
 TO RUN APPLICATION
-Pass MNIST or MARKET as application parameter to run either data set. (default is MNIST)
-Examples:
-	java -cp ./bin/ jmr.nn.NNApp1 MNIST
-	java -cp ./bin/ jmr.nn.NNApp1 MARKET
-      
+From folder NN-master/NN/
+	java -cp ./bin/ jmr.nn.NNApp1 
+	java -cp ./bin/ jmr.nn.NNApp1     
      
       
 CLASSES OVERVIEW

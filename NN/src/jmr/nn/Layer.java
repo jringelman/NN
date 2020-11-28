@@ -5,7 +5,7 @@ import java.util.Arrays;
 import jmr.util.ArrayUtil;
 import jmr.util.StdOut;
 
-public class NNLayer {
+public class Layer {
 	
 	Neuron [] m_aNeurons;
 	int m_nLayerNbr;
@@ -13,7 +13,7 @@ public class NNLayer {
 	double m_dBias;
 	
 	
-	public NNLayer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
+	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
 	{
 		m_nLayerNbr = nLayerNbr;
 		m_aNeurons = new Neuron[nNbrNeurons];
@@ -100,7 +100,7 @@ public class NNLayer {
         final int iNBR_OF_INPUTS = 2;
 		double dBias = 0.35; 
 
-		NNLayer layer = new NNLayer(iLAYER_NBR, iNBR_OF_INPUTS, iNBR_NEURONS, dBias);
+		Layer layer = new Layer(iLAYER_NBR, iNBR_OF_INPUTS, iNBR_NEURONS, dBias);
 	    
 		double[][] aadWeights = {{0.15,0.2},{0.25,0.3}} ;
 		layer.setWeights(aadWeights);

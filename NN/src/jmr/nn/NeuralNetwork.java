@@ -7,7 +7,7 @@ import jmr.util.ArrayUtil;
 import jmr.util.StdOut;
 
 
-/* NeuralNetwork is composed of 1 or more NNLayers which are composed of Neurons.
+/* NeuralNetwork is composed of 1 or more Layers which are composed of Neurons.
  * There is no input layer. Inputs are simply passed to the first layer
  * The last layer is the output layer. Prior layers are hidden layers.
  * By default, the initial weights for each neuron are randomly generated. For debugging, the weights can be overridden.
@@ -16,14 +16,14 @@ import jmr.util.StdOut;
 
 public class NeuralNetwork {
 	
-	NNLayer [] m_aLayer;
+	Layer [] m_aLayer;
 	double m_dLearningRate;
 	int m_iNbrInputs;
 	
 	//THERE ARE 2 CONSTRUCTORS FOR CREATING NeuralNetwork
 	
 	//METHOD 1 IS TO CREATE THE NNLAYERS THEN PASS THEM IN
-	public NeuralNetwork(NNLayer [] aLayers, double dLearningRate){
+	public NeuralNetwork(Layer [] aLayers, double dLearningRate){
 		m_aLayer =  aLayers;
 		m_dLearningRate = dLearningRate;
 		m_iNbrInputs = aLayers[0].getNumberInputs();
@@ -39,14 +39,14 @@ public class NeuralNetwork {
 		if (aiNbrNeuronsByLayer.length != adBiasByLayer.length) throw new RuntimeException("Mismatch params in NeuralNetwork constructor");
 
 		m_iNbrInputs = iNbrNNInputs;
-		this.m_aLayer = new NNLayer[aiNbrNeuronsByLayer.length];
+		this.m_aLayer = new Layer[aiNbrNeuronsByLayer.length];
 		m_dLearningRate = dLearningRate;
 		
 		int iNbrLayerInputs = iNbrNNInputs;
 		for (int iLayer=0; iLayer < aiNbrNeuronsByLayer.length; iLayer++)
 		{
 			//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
-			m_aLayer[iLayer] = new NNLayer(iLayer, iNbrLayerInputs, aiNbrNeuronsByLayer[iLayer], adBiasByLayer[iLayer]);
+			m_aLayer[iLayer] = new Layer(iLayer, iNbrLayerInputs, aiNbrNeuronsByLayer[iLayer], adBiasByLayer[iLayer]);
 			iNbrLayerInputs = aiNbrNeuronsByLayer[iLayer];
 		}
 	}
@@ -187,11 +187,11 @@ public class NeuralNetwork {
       	double[] adTarget = {0.01,0.99};  
         final double dLEARNING_RATE = 0.5;
       	
-		NNLayer [] aLayer = new NNLayer[2];
+		Layer [] aLayer = new Layer[2];
 
 		//	public Layer(int nLayerNbr,  int nNbrInputs, int nNbrNeurons, double dBias)
-        aLayer[0] = new NNLayer(0, adInput.length, iNBR_NEURONS_LAYER_0, dLAYER_0_BIAS);
-        aLayer[1] = new NNLayer(1, iNBR_NEURONS_LAYER_0, iNBR_NEURONS_LAYER_1, dLAYER_1_BIAS);
+        aLayer[0] = new Layer(0, adInput.length, iNBR_NEURONS_LAYER_0, dLAYER_0_BIAS);
+        aLayer[1] = new Layer(1, iNBR_NEURONS_LAYER_0, iNBR_NEURONS_LAYER_1, dLAYER_1_BIAS);
 
         NeuralNetwork nn = new NeuralNetwork(aLayer, dLEARNING_RATE);
         
